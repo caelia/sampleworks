@@ -56,3 +56,13 @@ pub fn dump(path: String, width: usize) {
     println!("   MIN: {} / MAX: {}", all_min, all_max);
     println!();
 }
+
+pub fn dump_raw(path: String) {
+    let data = stream_data(&path);
+    println!(":: {} ::::::::", path);
+    println!("   COUNT: {}", data.len());
+    for datum in data {
+        println!("   {}", datum);
+    }
+    println!();
+}

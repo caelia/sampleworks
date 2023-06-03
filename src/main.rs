@@ -19,7 +19,8 @@ fn main() {
         println!("Please provide one or more file names.");
     } else {
         for fname in args.skip(1) {
-            dump(fname, 320);
+            // dump(fname, 320);
+            dump_raw(fname);
         }
     }
 
