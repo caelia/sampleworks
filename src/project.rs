@@ -109,6 +109,7 @@ impl Project {
             let (all_min, all_max, minmaxes) = data.clone();
             let vscale = (height as f32 / 2.0) / f32::max(i16::abs(all_min) as f32, i16::abs(all_max) as f32);
 
+            // UH-UH! Need to get rid of fg.clone()
             let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
             wf_img.draw(minmaxes);
             let path = self.get_image_path(&fname);
