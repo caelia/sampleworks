@@ -3,10 +3,14 @@
 #![allow(dead_code)]
 
 use anyhow::Result;
+use image::Rgb;
 
 use std::path::{Path, PathBuf};
 use std::fs::{create_dir, create_dir_all, remove_dir_all};
 use std::collections::HashMap;
+
+use crate::img::*;
+use crate::audio::*;
 
 pub enum SourceSpec {
     Dir(PathBuf),
@@ -64,5 +68,54 @@ impl Project {
             .to_string()
             .replace(std::path::MAIN_SEPARATOR_STR, "-");
         image_dir.join(PathBuf::from(image_name_stem).with_extension("png"))
+    }
+
+    pub fn get_src_files(&self) -> Result<Vec<PathBuf>> {
+        let mut files = vec![];
+        match self.source {
+            SourceSpec::Files(ref files_) => files = files_.to_vec(),
+            SourceSpec::Dir(ref dir) => {
+                let read_result = dir.read_dir();
+                match read_result {
+                    Ok(entries) => {
+                        for entry in entries {
+                            match entry {
+                                Ok(ent) => {
+                                    files.push(dir.join(ent.file_name()));
+                                },
+                                Err(e) => return Err(e.into())
+                            }
+                        }
+                    },
+                    Err(e) => return Err(e.into()),
+                }
+            }
+        }
+
+        Ok(files)
+    }
+
+    pub fn create_thumbs(
+            &self, files: Vec<PathBuf>,
+            size: (u32, u32),
+            fg: Fill,
+            bg: Rgb<u8>) -> Result<()> {
+        for fname in files {
+            let (width, height) = size;
+            let raw_data = stream_data(&fname);
+            let nframes = raw_data.len();
+
+            let data = get_min_maxes(raw_data, nframes, width as usize);
+            let (all_min, all_max, minmaxes) = data.clone();
+            let vscale = (height as f32 / 2.0) / f32::max(i16::abs(all_min) as f32, i16::abs(all_max) as f32);
+
+            let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
+            wf_img.draw(minmaxes);
+            let path = self.get_image_path(&fname);
+            println!("Saving image to {:?}", path);
+            wf_img.save(&path);
+        }
+        
+        Ok(())
     }
 }

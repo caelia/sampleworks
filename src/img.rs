@@ -5,6 +5,7 @@
 use std::path::PathBuf;
 use image::{ImageBuffer, Rgb, RgbImage, Pixel};
 
+#[derive(Clone)]
 pub enum Fill {
     Solid(Rgb<u8>),
     Gradient(Rgb<u8>, Rgb<u8>, u32, u32),
@@ -50,6 +51,7 @@ impl WaveformImg {
         let mut bb = vec![b0; height];
 
         let populate = |values: &mut Vec<u8>, c0: u8, c1: u8, cdiff: i16| {
+            println!("start: {}, end: {}", start, end);
             for y in start..end {
                 let rel_y = y - start;
                 let pct = rel_y as f32 / distance as f32;
