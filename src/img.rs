@@ -108,6 +108,7 @@ impl WaveformImg {
         // let fy = y as f32;
         // Flip value because negative sample values should be in the lower half of the image, i.e. high y-coordinates
         let fy = -(y as f32);
+        assert!(fy >= 0.0);
         (fmid + fy * self.vscale) as u32
     }
 
@@ -142,41 +143,4 @@ impl WaveformImg {
             self.ibuf.put_pixel(x, y, self.bg);
         }
     }
-
-    /*
-    fn interpolate_rgb(&self, y: u32) -> Rgb<u8> {
-        match self.fg {
-            Fill::Gradient(color0, color1, start, end) => {
-                let Rgb([r0, g0, b0]) = color0;
-                let Rgb([r1, g1, b1]) = color1;
-                let distance = end - start;
-                let rel_y = y - start;
-                let pct = rel_y as f32 / distance as f32;
-                let r = if r0 == r1 {
-                    r0
-                } else {
-                    let delta = (r1 as i16 - r0 as i16) as f32 * pct;
-                    let rf = r0 as f32 + delta;
-                    rf as u8
-                };
-                let g = if g0 == g1 {
-                    g0
-                } else {
-                    let delta = (g1 as i16 - g0 as i16) as f32 * pct;
-                    let gf = g0 as f32 + delta;
-                    gf as u8
-                };
-                let b = if b0 == b1 {
-                    b0
-                } else {
-                    let delta = (b1 as i16 - b0 as i16) as f32 * pct;
-                    let bf = b0 as f32 + delta;
-                    bf as u8
-                };
-                Rgb([r, g, b])
-            },
-            Fill::Solid(_) => panic!("This should never happen."),
-        }
-    }
-    */
 }
