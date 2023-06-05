@@ -17,13 +17,18 @@ pub fn stream_data(path: &String) -> Vec<i16> {
 
 pub fn get_min_maxes(data: Vec<i16>, nframes: usize, width: usize) -> (i16, i16, Vec<(i16, i16)>) {
     let mut min_maxes = Vec::new();
-    let mut all_max: i16 = 0;
-    let mut all_min: i16 = 0;
+    let mut all_max: i16 = i16::MIN;
+    let mut all_min: i16 = i16::MAX;
+    let group_size = nframes / width;
     for i in 0..width {
-        let mut range_max: i16 = 0;
-        let mut range_min: i16 = 0;
-        for j in 0..(nframes / width) {
-            let smp = data[i + j];
+        let mut range_max: i16 = i16::MIN;
+        let mut range_min: i16 = i16::MAX;
+        for j in 0..group_size {
+            let idx = i * group_size + j;
+            if idx > nframes - 1 {
+                break
+            }
+            let smp = data[idx];
             if smp > range_max {
                 range_max = smp;
             }
