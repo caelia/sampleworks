@@ -9,20 +9,20 @@ use std::path::{Path, PathBuf};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 
 
-pub fn stream_data(path: &PathBuf) -> Vec<i16> {
+pub fn stream_data(path: &PathBuf) -> Vec<i32> {
     let reader = BufReader::new(File::open(path).unwrap());
     let dec = Decoder::new(reader).unwrap();
-    dec.collect::<Vec<i16>>()
+    dec.collect::<Vec<i32>>()
 }
 
-pub fn get_min_maxes(data: Vec<i16>, nframes: usize, width: usize) -> (i16, i16, Vec<(i16, i16)>) {
+pub fn get_min_maxes(data: Vec<i32>, nframes: usize, width: usize) -> (i32, i32, Vec<(i32, i32)>) {
     let mut min_maxes = Vec::new();
-    let mut all_max: i16 = i16::MIN + 1;
-    let mut all_min: i16 = i16::MAX - 1;
+    let mut all_max: i32 = i32::MIN + 1;
+    let mut all_min: i32 = i32::MAX - 1;
     let group_size = nframes / width;
     for i in 0..width {
-        let mut range_max: i16 = i16::MIN + 1;
-        let mut range_min: i16 = i16::MAX - 1;
+        let mut range_max: i32 = i32::MIN + 1;
+        let mut range_min: i32 = i32::MAX - 1;
         for j in 0..group_size {
             let idx = i * group_size + j;
             if idx > nframes - 1 {
