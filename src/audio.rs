@@ -17,18 +17,25 @@ pub fn stream_data(path: &PathBuf) -> Vec<i16> {
 
 pub fn get_min_maxes(data: Vec<i16>, nframes: usize, width: usize) -> (i16, i16, Vec<(i16, i16)>) {
     let mut min_maxes = Vec::new();
-    let mut all_max: i16 = i16::MIN + 1;
+    let mut all_max: i16 = i16::MIN + 2;
     let mut all_min: i16 = i16::MAX - 1;
+    // let mut all_min: i16 = i16::MAX;
     let group_size = nframes / width;
     for i in 0..width {
-        let mut range_max: i16 = i16::MIN + 1;
+        let mut range_max: i16 = i16::MIN + 2;
         let mut range_min: i16 = i16::MAX - 1;
+        // let mut range_min: i16 = i16::MAX;
         for j in 0..group_size {
             let idx = i * group_size + j;
             if idx > nframes - 1 {
                 break
             }
-            let smp = data[idx];
+            let mut smp = data[idx];
+            if smp < (i16::MIN + 2) {
+                smp = i16::MIN + 2;
+            } else if smp > i16::MAX {
+                smp = i16::MAX;
+            }
             if smp > range_max {
                 range_max = smp;
             }
@@ -42,10 +49,8 @@ pub fn get_min_maxes(data: Vec<i16>, nframes: usize, width: usize) -> (i16, i16,
                 all_min = smp;
             }
         }
-        println!("range_min: {}, range_max: {}", range_min, range_max);
         min_maxes.push((range_min, range_max))
     }
-    println!("all_min: {}, all_max: {}", all_min, all_max);
 
     (all_min, all_max, min_maxes)
 }

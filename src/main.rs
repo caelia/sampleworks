@@ -57,15 +57,15 @@ fn main() -> Result<()> {
         let nframes = raw_data.len();
         let data = get_min_maxes(raw_data, nframes, img_width as usize);
         let (all_min, all_max, minmaxes) = data.clone();
-        // let vscale = (img_height as f32 / 2.0) / f32::max(i16::abs(all_min) as f32, i16::abs(all_max) as f32);
+        let vscale = (img_height as f32 / 2.0) / f32::max(i16::abs(all_min) as f32, i16::abs(all_max) as f32);
+        /*
         let half_height = img_height as f32 / 2.0;
-        println!("all_min: {}", all_min);
-        println!("all_max: {}", all_max);
         let abs_min = i16::abs(all_min);
         let abs_max = i16::abs(all_max);
         let max_data_height_ = i16::max(abs_min, abs_max);
         let max_data_height = max_data_height_ as f32;
         let vscale = half_height / max_data_height;
+        */
 
         // let mut wf_img = WaveformImg::new(img_width, img_height, vscale, Fill::Solid(Rgb([187, 0, 0])), Rgb([204, 204, 204]));
         let mut wf_img = WaveformImg::new(

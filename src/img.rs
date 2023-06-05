@@ -108,7 +108,12 @@ impl WaveformImg {
         // let fy = y as f32;
         // Flip value because negative sample values should be in the lower half of the image, i.e. high y-coordinates
         let fy = -(y as f32);
-        assert!(fy >= 0.0);
+        // assert!(fy >= 0.0);
+        /*
+        if fy < 0.0 {
+            println!("UH-OH! fy = {}", fy);
+        }
+        */
         (fmid + fy * self.vscale) as u32
     }
 
