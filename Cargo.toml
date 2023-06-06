@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sndfile = "0.1"
+# sndfile = "0.1"
 rodio = "0.17"
 image = "0.24"
 gtk4 = "0.6"
 glib = "0.17"
-cpal = "0.15"
+# cpal = "0.15"
+anyhow = "1.0"
