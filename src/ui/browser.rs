@@ -13,6 +13,12 @@ use rodio::{Decoder, OutputStream, source::Source};
 
 use std::collections::HashMap;
 
+const CSS: &str = "
+    picture {
+        border: 1px solid #c0c0c0;
+    }
+";
+
 pub struct DumbBrowser {
     snd_dir: PathBuf,
     img_dir: PathBuf,
@@ -49,6 +55,14 @@ impl DumbBrowser {
                 .title("SampleWorks Prototype")
                 .build();
 
+            let cssp = gtk::CssProvider::new();
+            cssp.load_from_data(CSS);
+            gtk::style_context_add_provider_for_display(
+                &gtk::gdk::Display::default().expect("SMUCK!"),
+                &cssp,
+                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION
+            );
+
             let fbox = gtk::FlowBox::builder()
                 .valign(gtk::Align::Start)
                 .max_children_per_line(9)
@@ -59,12 +73,13 @@ impl DumbBrowser {
             for file in &img_files {
                 match file {
                     Some(path) => {
-                        // let img = Image::from_file(path);
-                        // img.allocate(200, 80, -1, None);
-                        // img.set_size_request(200, 80);
-                        // img.width_request(-1);
-                        // img.height_request(-1);
                         let img = Picture::for_filename(&path);
+                        let ectrl = gtk::GestureClick::new();
+                        let message = format!("{:?}", path);
+                        ectrl.connect_pressed(move |_, _, _, _| {
+                            println!("{}", message)
+                        });
+                        img.add_controller(ectrl);
                         fbox.insert(&img, -1);
                     },
                     None => (),
