@@ -113,7 +113,6 @@ impl Project {
             let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
             wf_img.draw(minmaxes);
             let path = self.get_image_path(&fname);
-            println!("Saving image to {:?}", path);
             wf_img.save(&path);
         }
         

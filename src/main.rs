@@ -47,7 +47,9 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
 fn main() -> Result<()> {
     let src_path = PathBuf::from("/tmp/swtest-src");
     let proj_path = PathBuf::from("/tmp/swtest-proj");
-    // let _ = create_thumbs(src_path, proj_path)
+
+    let _ = create_thumbs(src_path.clone(), proj_path.clone());
+
     let browser = DumbBrowser::new(
         src_path,
         proj_path.join("images")

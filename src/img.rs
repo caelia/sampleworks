@@ -51,7 +51,6 @@ impl WaveformImg {
         let mut bb = vec![b0; height];
 
         let populate = |values: &mut Vec<u8>, c0: u8, c1: u8, cdiff: i16| {
-            println!("start: {}, end: {}", start, end);
             for y in start..end {
                 let rel_y = y - start;
                 let pct = rel_y as f32 / distance as f32;
