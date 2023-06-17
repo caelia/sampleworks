@@ -29,19 +29,45 @@ const HASH_2_SRC_SQL: &str = "
     SELECT source FROM sources_x_hashes WHERE hash = ?1;
 ";
 
-pub struct SourceIndex {
+pub enum Domain {
+    Source,
+    Temp,
+    Project(&'static Path),
+}
+pub struct Index {
     conn: Connection,
 }
 
-impl SourceIndex {
-    pub fn new() -> Result<Self> {
-        let data_dir = match base_dirs() {
-            Ok(ref bd) => bd.data_local_dir(),
-            Err(e) => return Err(anyhow!(e)),
+impl Index {
+    pub fn new(domain: Domain) -> Result<Self> {
+        let db_path = match domain {
+            Domain::Source => {
+                match base_dirs() {
+                    Ok(ref bd) => {
+                        let dir = bd.data_local_dir();
+                        dir.join("source_index.db")
+                    },
+                    Err(e) => return Err(anyhow!(e)),
+                }
+            },
+            Domain::Temp => {
+                match base_dirs() {
+                    Ok(ref bd) => {
+                        let dir = match bd.runtime_dir() {
+                            Some(rd) => rd,
+                            None => bd.cache_dir(),
+                        };
+                        dir.join("temp_index.db")
+                    },
+                    Err(e) => return Err(anyhow!(e)),
+                }
+            },
+            Domain::Project(path) => {
+                path.join("project_index.db")
+            }
         };
-        let db_path = data_dir.join("source_index.db");
         let conn = Connection::open(db_path)?;
-        Ok(SourceIndex { conn })
+        Ok(Index { conn })
     }
 
     pub fn init(&mut self) -> Result<()> {
