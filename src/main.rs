@@ -6,6 +6,8 @@ mod audio;
 mod img;
 mod project;
 mod ui;
+mod app_data;
+mod util;
 
 use std::fs::File;
 use std::io::BufReader;
