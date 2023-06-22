@@ -5,6 +5,9 @@
 mod audio;
 mod img;
 mod project;
+mod ui;
+mod app_data;
+mod util;
 
 use std::fs::File;
 use std::io::BufReader;
@@ -17,12 +20,13 @@ use anyhow::Result;
 use crate::audio::*;
 use crate::img::*;
 use crate::project::{Project, SourceSpec};
+use crate::ui::browser::DumbBrowser;
 
 
-fn main() -> Result<()> {
+fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
     let project = Project::new(
-        SourceSpec::Dir(PathBuf::from("/tmp/swtest-src")),
-        PathBuf::from("/tmp/swtest-proj"),
+        SourceSpec::Dir(src_path),
+        proj_path,
     );
     let proj_result = project.init(true);
     // for fname in args.skip(1) {
@@ -40,7 +44,20 @@ fn main() -> Result<()> {
         },
         Err(e) => Err(e.into()),
     }
+}
 
+fn main() -> Result<()> {
+    let src_path = PathBuf::from("/tmp/swtest-src");
+    let proj_path = PathBuf::from("/tmp/swtest-proj");
+
+    let _ = create_thumbs(src_path.clone(), proj_path.clone());
+
+    let browser = DumbBrowser::new(
+        src_path,
+        proj_path.join("images")
+    );
+    let _ = browser.run();
+    Ok(())
 }
 
     /*
