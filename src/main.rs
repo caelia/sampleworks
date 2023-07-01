@@ -23,6 +23,10 @@ use crate::project::{Project, SourceSpec};
 use crate::ui::browser::DumbBrowser;
 
 
+const SRC_PATH: &str = "/tmp/swtest-src";
+const PROJ_PATH: &str = "/tmp/swtest-proj";
+
+
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
     let project = Project::new(
         SourceSpec::Dir(src_path),
@@ -47,8 +51,8 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let src_path = PathBuf::from("/tmp/swtest-src");
-    let proj_path = PathBuf::from("/tmp/swtest-proj");
+    let src_path = PathBuf::from(SRC_PATH);
+    let proj_path = PathBuf::from(PROJ_PATH);
 
     let _ = create_thumbs(src_path.clone(), proj_path.clone());
 
