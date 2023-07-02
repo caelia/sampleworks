@@ -7,9 +7,9 @@ use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-fn base_dirs() -> Result<&'static ProjectDirs> {
+fn base_dirs() -> Result<ProjectDirs> {
     match ProjectDirs::from("org", "sampleworks", "Sampleworks") {
-        Some(pd) => Ok(&pd),
+        Some(pd) => Ok(pd.clone()),
         None => Err(anyhow!("No valid home directory found.")),
     }
 }
