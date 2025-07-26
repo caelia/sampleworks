@@ -2,11 +2,14 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+mod common;
+mod config;
 mod audio;
 mod img;
 mod project;
 mod ui;
 mod app_data;
+mod caching;
 mod util;
 
 use std::fs::File;
@@ -16,15 +19,19 @@ use std::path::{Path, PathBuf};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 use image::Rgb;
 use anyhow::Result;
+use configura;
 
 use crate::audio::*;
 use crate::img::*;
 use crate::project::{Project, SourceSpec};
 use crate::ui::browser::DumbBrowser;
+use crate::config::SWConfig;
 
-
+/*
 const SRC_PATH: &str = "/tmp/swtest-src";
 const PROJ_PATH: &str = "/tmp/swtest-proj";
+*/
+const DEMO: bool = true;
 
 
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
@@ -51,8 +58,19 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let src_path = PathBuf::from(SRC_PATH);
-    let proj_path = PathBuf::from(PROJ_PATH);
+    let cfg = match configura::load_config::<SWConfig>() {
+        Ok(config) => config,
+        Err(_) => SWConfig::default()
+    };
+
+    let src_path = cfg.demo_source_path;
+    let proj_path = cfg.default_project_path.join("demo");
+    if !proj_path.exists() {
+        match std::fs::create_dir_all(&proj_path) {
+            Ok(_) => (),
+            Err(_) => panic!("failed to create project path")
+        }
+    }
 
     let _ = create_thumbs(src_path.clone(), proj_path.clone());
 

@@ -48,7 +48,6 @@ impl Project {
     }
 
     pub fn init(&self, overwrite: bool) -> Result<()> {
-        // assert!(!self.proj_dir.exists());
         if self.proj_dir.exists() {
             if overwrite {
                 remove_dir_all(&self.proj_dir)?;
