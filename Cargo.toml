@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 # sndfile = "0.1"
 # cpal = "0.15"
-rodio = "0.20"
+rodio = "0.21"
 image = "0.25"
 gtk4 = "0.9"
 glib = "0.20"

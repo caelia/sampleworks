@@ -11,6 +11,7 @@ mod ui;
 mod app_data;
 mod caching;
 mod util;
+mod messaging;
 
 use std::fs::File;
 use std::io::BufReader;
