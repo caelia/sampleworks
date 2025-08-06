@@ -1,3 +1,4 @@
+/*
 use std::sync::mpsc::{Sender, SyncSender, Receiver, channel, sync_channel};
 use anyhow::{self, Result};
 
@@ -12,3 +13,4 @@ pub enum Message {
 pub trait Messenger {
     fn send(msg: Message) -> Result<()>;
 }
+*/

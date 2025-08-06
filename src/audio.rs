@@ -9,32 +9,32 @@ use std::path::{Path, PathBuf};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 
 
-pub fn stream_data(path: &PathBuf) -> Vec<i16> {
-    let reader = BufReader::new(File::open(path).unwrap());
-    let dec = Decoder::new(reader).unwrap();
-    dec.collect::<Vec<i16>>()
+pub fn stream_data(path: &PathBuf) -> Vec<f32> {
+    let file = File::open(path).unwrap();
+    let dec = Decoder::new(file).unwrap();
+    dec.collect::<Vec<f32>>()
 }
 
-pub fn get_min_maxes(data: Vec<i16>, nframes: usize, width: usize) -> (i16, i16, Vec<(i16, i16)>) {
+pub fn get_min_maxes(data: Vec<f32>, nframes: usize, width: usize) -> (f32, f32, Vec<(f32, f32)>) {
     let mut min_maxes = Vec::new();
-    let mut all_max: i16 = i16::MIN + 2;
-    let mut all_min: i16 = i16::MAX - 1;
-    // let mut all_min: i16 = i16::MAX;
+    let mut all_max: f32 = f32::MIN + 2.0;
+    let mut all_min: f32 = f32::MAX - 1.0;
+    // let mut all_min: f32 = f32::MAX;
     let group_size = nframes / width;
     for i in 0..width {
-        let mut range_max: i16 = i16::MIN + 2;
-        let mut range_min: i16 = i16::MAX - 1;
-        // let mut range_min: i16 = i16::MAX;
+        let mut range_max: f32 = f32::MIN + 2.0;
+        let mut range_min: f32 = f32::MAX - 1.0;
+        // let mut range_min: f32 = f32::MAX;
         for j in 0..group_size {
             let idx = i * group_size + j;
             if idx > nframes - 1 {
                 break
             }
             let mut smp = data[idx];
-            if smp < (i16::MIN + 2) {
-                smp = i16::MIN + 2;
-            } else if smp > i16::MAX {
-                smp = i16::MAX;
+            if smp < (f32::MIN + 2.0) {
+                smp = f32::MIN + 2.0;
+            } else if smp > f32::MAX {
+                smp = f32::MAX;
             }
             if smp > range_max {
                 range_max = smp;

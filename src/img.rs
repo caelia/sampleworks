@@ -93,7 +93,7 @@ impl WaveformImg {
         Some(table)
     }
 
-    pub fn draw(&mut self, data: Vec<(i16, i16)>) {
+    pub fn draw(&mut self, data: Vec<(f32, f32)>) {
         for i in 0..data.len() {
             let (lo, hi) = data[i];
             self.draw_vline(i as u32, self.scale_y(hi), self.scale_y(lo));
@@ -104,11 +104,11 @@ impl WaveformImg {
         let _ = self.ibuf.save(path);
     } 
 
-    fn scale_y(&self, y: i16) -> u32 {
+    fn scale_y(&self, y: f32) -> u32 {
         let fmid = (self.height / 2) as f32;
         // let fy = y as f32;
         // Flip value because negative sample values should be in the lower half of the image, i.e. high y-coordinates
-        let fy = -(y as f32);
+        let fy = -y;
         // assert!(fy >= 0.0);
         /*
         if fy < 0.0 {
