@@ -28,10 +28,6 @@ use crate::project::{Project, SourceSpec};
 use crate::ui::browser::DumbBrowser;
 use crate::config::SWConfig;
 
-/*
-const SRC_PATH: &str = "/tmp/swtest-src";
-const PROJ_PATH: &str = "/tmp/swtest-proj";
-*/
 const DEMO: bool = true;
 
 
