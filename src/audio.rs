@@ -8,6 +8,14 @@ use std::path::{Path, PathBuf};
 // use sndfile::{OpenOptions, ReadOptions};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 
+pub enum QItem {
+    File(String, PathBuf),
+    Data(String, Vec<f32>),
+    Loop,
+    End,
+}
+
+pub type Queue = Vec<QItem>;
 
 pub fn stream_data(path: &PathBuf) -> Vec<f32> {
     let file = File::open(path).unwrap();

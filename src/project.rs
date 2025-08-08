@@ -95,7 +95,8 @@ impl Project {
     }
 
     pub fn create_thumbs(
-            &self, files: Vec<PathBuf>,
+            &self,
+            files: Vec<PathBuf>,
             size: (u32, u32),
             fg: Fill,
             bg: Rgb<u8>) -> Result<()> {
