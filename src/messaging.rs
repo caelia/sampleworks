@@ -14,3 +14,22 @@ pub trait Messenger {
     fn send(msg: Message) -> Result<()>;
 }
 */
+
+pub enum Position {
+    Start,
+    End,
+    TimePoint(f32),
+    PercentagePoint(f32)
+}
+
+pub enum ACRequest {
+    Audition,
+    QueueAdd,
+    QueueInsert,
+    QueueRemove,
+    PlayQueue,
+    Pause,
+    Resume,
+    Stop,
+    GoTo(Position),
+}

@@ -2,11 +2,16 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+use rodio::{Decoder, decoder::DecoderError, source::Source};
+// use sndfile::{OpenOptions, ReadOptions};
+use anyhow::Result;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-// use sndfile::{OpenOptions, ReadOptions};
-use rodio::{Decoder, decoder::DecoderError, source::Source}; 
+use std::sync::{mpsc, Sender, Receiver};
+use std::thread::sleep;
+use std::time::Duration;
+use crate::messaging::ACRequest;
 
 pub enum QItem {
     File(String, PathBuf),
@@ -16,6 +21,36 @@ pub enum QItem {
 }
 
 pub type Queue = Vec<QItem>;
+
+pub struct Controller {
+    req_rx: Receiver<ACRequest>,
+    rsp_tx: Sender<Result<()>>,
+}
+
+impl Controller {
+    pub fn new(req_rx: Receiver<ACRequest>, rsp_tx: Sender<Result<()>>) -> Self {
+        Controller {
+            req_rx,
+            rsp_tx,
+        }
+    }
+
+    pub fn run(&self) -> Result<()> {
+        let interval = Duration::from_millis(10);
+        loop {
+            let msg = self.req_rx.recv().unwrap();
+            sleep(interval);
+        }
+    }
+
+    pub fn audition(&self) -> Result<()> {
+        Ok(())        
+    }
+
+    pub fn play_queue(&self, queue: Queue, do_loop: bool) -> Result<()> {
+        Ok(())
+    }
+}
 
 pub fn stream_data(path: &PathBuf) -> Vec<f32> {
     let file = File::open(path).unwrap();
