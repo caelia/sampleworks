@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{mpsc, Sender, Receiver};
 use std::thread::sleep;
 use std::time::Duration;
-use crate::messaging::ACRequest;
+use crate::messaging::{ACReq, ACRsp};
 
 pub enum QItem {
     File(String, PathBuf),
@@ -20,11 +20,19 @@ pub enum QItem {
     End,
 }
 
+pub enum AudioState {
+    Stopped,
+    Paused,
+    Running,
+}
+
 pub type Queue = Vec<QItem>;
 
 pub struct Controller {
     req_rx: Receiver<ACRequest>,
     rsp_tx: Sender<Result<()>>,
+    state: AudioState,
+    queue: Option<Queue>,
 }
 
 impl Controller {
@@ -32,13 +40,19 @@ impl Controller {
         Controller {
             req_rx,
             rsp_tx,
+            state: AudioState::Stopped,
+            queue: None,
         }
     }
 
-    pub fn run(&self) -> Result<()> {
+    pub fn run(&mut self) -> Result<()> {
         let interval = Duration::from_millis(10);
         loop {
-            let msg = self.req_rx.recv().unwrap();
+            match self.req_rx.try_recv() {
+                Ok(ACReq::Audition) => (),
+                Ok(ACReq::Stop) => (),
+                _ => (),
+            }
             sleep(interval);
         }
     }

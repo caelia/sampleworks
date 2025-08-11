@@ -22,7 +22,7 @@ pub enum Position {
     PercentagePoint(f32)
 }
 
-pub enum ACRequest {
+pub enum ACReq {
     Audition,
     QueueAdd,
     QueueInsert,
@@ -32,4 +32,11 @@ pub enum ACRequest {
     Resume,
     Stop,
     GoTo(Position),
+}
+
+pub enum ACRsp {
+    Running,
+    Paused(f32),
+    Done,
+    Error(f32),
 }
