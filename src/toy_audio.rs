@@ -10,10 +10,6 @@ use std::time::Duration;
 use std::path::PathBuf;
 use std::fs::File;
 
-pub const PATH1: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_BERIMBAU_PERC_LPS/KVE_085_Berimbau_Perc_14.flac";
-pub const PATH2: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_D_TABLA_PERC_LPS/KVE_150_D_Tabla_Perc_11.flac";
-pub const PATH3: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_SPACE_DRUM_LPS/KVE_096_Space_Drum_Perc_08.flac";
-
 pub enum Req {
     Play(PathBuf),
     Pause,
@@ -85,7 +81,8 @@ impl Controller {
                     break;
                 },
                 Err(_) => {
-                    println!(":: no message ::");
+                    ()
+                    // println!(":: no message ::");
                     // break;
                 }
             }
