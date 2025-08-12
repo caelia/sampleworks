@@ -100,7 +100,7 @@ mod toy_audio;
 use toy_audio::{Controller, Req, Rsp};
 
 use anyhow::{anyhow, Result, Error};
-use rand::prelude::*;
+// use rand::prelude::*;
 
 use std::thread;
 use std::sync::mpsc::{Sender, Receiver, channel};
@@ -114,22 +114,27 @@ const PATH3: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_SP
 fn main() -> Result<()> {
     let (req_tx, req_rx) = channel();
     let (rsp_tx, rsp_rx) = channel();
-    let mut controller = Controller::new(req_rx, rsp_tx);
+    let mut controller = Controller::new(req_rx, rsp_tx, 1.0);
     thread::spawn(move || {
-        let _  = controller.run();
+        let _  = controller.run(true);
     });
+    /*
     let mut rng = rand::rng();
     let nums: Vec<u16> = (1..10000).collect();
     let small_sleep = Duration::from_secs(1);
+    */
     let thyme = Instant::now();
-    req_tx.send(Req::Play(PathBuf::from(PATH1)))?;
+    let paths = vec![PathBuf::from(PATH1), PathBuf::from(PATH2), PathBuf::from(PATH3)];
+    req_tx.send(Req::Play(paths))?;
     loop {
+        /*
         let x = nums.choose(&mut rng).unwrap();
         if *x > 9998 {
             let _ = req_tx.send(Req::Pause);
             thread::sleep(small_sleep);
             let _ = req_tx.send(Req::Resume);
         }
+        */
         match rsp_rx.try_recv() {
             Ok(Rsp::Running) => (),
             Ok(Rsp::Paused(_)) => (),
