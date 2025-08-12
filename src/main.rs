@@ -2,7 +2,6 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-/*
 mod common;
 mod config;
 mod audio;
@@ -92,8 +91,7 @@ fn main() -> Result<()> {
 }
     */
 
-*/
-
+/*
 // THE FOLLOWING CODE IS FOR toy-implementation BRANCH ONLY!
 
 mod toy_audio;
@@ -159,3 +157,4 @@ fn main() -> Result<()> {
     println!("Time: {} seconds.", elapsed_time);
     Ok(())
 }
+*/
