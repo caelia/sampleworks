@@ -2,6 +2,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+/*
 mod common;
 mod config;
 mod audio;
@@ -90,3 +91,56 @@ fn main() -> Result<()> {
     img.save(Path::new(fname).with_extension("png"));
 }
     */
+
+*/
+
+// THE FOLLOWING CODE IS FOR toy-implementation BRANCH ONLY!
+
+mod toy_audio;
+use toy_audio::{Controller, Req, Rsp};
+
+use anyhow::{anyhow, Result, Error};
+
+use std::thread;
+use std::sync::mpsc::{Sender, Receiver, channel};
+use std::path::PathBuf;
+use std::time::{Duration, Instant};
+
+const PATH1: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_BERIMBAU_PERC_LPS/KVE_085_Berimbau_Perc_14.flac";
+const PATH2: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_D_TABLA_PERC_LPS/KVE_150_D_Tabla_Perc_11.flac";
+const PATH3: &str = "/+/music/sample-sets/ARCANE_PERCUSSION/KVE_WAV_LOOPS/KVE_SPACE_DRUM_LPS/KVE_096_Space_Drum_Perc_08.flac";
+
+fn main() -> Result<()> {
+    let (req_tx, req_rx) = channel();
+    let (rsp_tx, rsp_rx) = channel();
+    let mut controller = Controller::new(req_rx, rsp_tx);
+    thread::spawn(move || {
+        let _  = controller.run();
+    });
+    let thyme = Instant::now();
+    req_tx.send(Req::Play(PathBuf::from(PATH1)))?;
+    loop {
+        match rsp_rx.try_recv() {
+            Ok(Rsp::Running) => (),
+            Ok(Rsp::Paused(_)) => (),
+            Ok(Rsp::Done) => {
+                println!("OK!");
+                break;
+            },
+            Ok(Rsp::Error(pos)) => {
+                println!("Audio error at position {}.", pos);
+                break;
+            },
+            Err(_) => (),
+            /*
+            Err(_) => {
+                println!("Failed to read response.");
+                break;
+            }
+            */
+        }
+    }
+    let elapsed_time = thyme.elapsed().as_secs_f32();
+    println!("Time: {} seconds.", elapsed_time);
+    Ok(())
+}
