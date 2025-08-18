@@ -17,6 +17,3 @@ Cargo.lock
 # Added by cargo
 
 /target
-
-# scratch is for experiments that aren't really part of the project
-scratch/
