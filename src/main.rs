@@ -65,9 +65,7 @@ fn main() -> Result<()> {
     };
 
     let src_path = cfg.demo_source_path;
-    println!("src_path: {:?}", src_path);
     let proj_path = cfg.default_project_path.join("demo");
-    println!("proj_path: {:?}", proj_path);
     if !proj_path.exists() {
         match std::fs::create_dir_all(&proj_path) {
             Ok(_) => (),

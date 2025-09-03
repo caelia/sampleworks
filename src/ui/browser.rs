@@ -133,6 +133,7 @@ impl SampleBrowser {
                         ));
                         img.add_controller(ectrl_ck);
                         img.add_controller(ectrl_lp);
+                        fbox.insert(&img, -1);
                     },
                     None => (),
                 }

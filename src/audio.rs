@@ -93,6 +93,7 @@ impl Controller {
         loop {
             match self.req_rx.try_recv() {
                 Ok(ACReq::Audition(path)) => {
+                    println!("Audition: {:?}", &path);
                     let file = File::open(path)?;
                     let src = Decoder::try_from(file)?;
                     sink.append(src)
