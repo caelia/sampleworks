@@ -9,7 +9,7 @@ use anyhow::Result;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::{Sender, Receiver, channel};
+use std::sync::mpsc::{Sender, Receiver};
 use std::thread::sleep;
 use std::time::Duration;
 use std::iter::Iterator;

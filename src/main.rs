@@ -12,16 +12,17 @@ mod app_data;
 mod caching;
 mod util;
 mod messaging;
-mod toy_audio;
 
-use std::fs::File;
-use std::io::BufReader;
-use std::path::{Path, PathBuf};
 // use sndfile::{OpenOptions, ReadOptions};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 use image::Rgb;
 use anyhow::Result;
 use configura;
+
+use std::fs::File;
+use std::io::BufReader;
+use std::path::{Path, PathBuf};
+use std::sync::mpsc::{Sender, Receiver, channel};
 
 use crate::audio::*;
 use crate::img::*;
