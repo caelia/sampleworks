@@ -12,6 +12,7 @@ mod app_data;
 mod caching;
 mod util;
 mod messaging;
+mod toy_audio;
 
 use std::fs::File;
 use std::io::BufReader;

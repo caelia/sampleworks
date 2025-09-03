@@ -5,19 +5,44 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, FlowBox, Image, Picture};
+use gtk::glib;
+use glib::source::SourceId;
+
+use rodio::{Decoder, OutputStream, source::Source};
 
 use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;
-use rodio::{Decoder, OutputStream, source::Source};
-
 use std::collections::HashMap;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 const CSS: &str = "
     picture {
         border: 1px solid #c0c0c0;
     }
 ";
+
+pub struct SidWrapper {
+    id: RefCell<Option<SourceId>>,
+}
+
+impl SidWrapper {
+    fn new() -> Self {
+        SidWrapper { id: RefCell::new(None) }
+    }
+
+    fn set(&self, sid: SourceId) {
+        let _ = self.id.replace(Some(sid));
+    }
+
+    fn cancel(&self) {
+        match self.id.take() {
+            Some(sid) => sid.remove(),
+            None => (),
+        }
+    }
+}
 
 pub struct DumbBrowser {
     snd_dir: PathBuf,

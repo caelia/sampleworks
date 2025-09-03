@@ -2,23 +2,28 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use rodio::{Decoder, decoder::DecoderError, source::Source};
+use rodio::{Decoder, decoder::DecoderError, Sink, OutputStream, OutputStreamBuilder, source::Source};
 // use sndfile::{OpenOptions, ReadOptions};
 use anyhow::Result;
+
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-use std::sync::{mpsc, Sender, Receiver};
+use std::sync::mpsc::{Sender, Receiver, channel};
 use std::thread::sleep;
 use std::time::Duration;
+use std::iter::Iterator;
+
 use crate::messaging::{ACReq, ACRsp};
 
+/*
 pub enum QItem {
     File(String, PathBuf),
     Data(String, Vec<f32>),
     Loop,
     End,
 }
+*/
 
 pub enum AudioState {
     Stopped,
@@ -26,17 +31,52 @@ pub enum AudioState {
     Running,
 }
 
-pub type Queue = Vec<QItem>;
+// pub type Queue = Vec<QItem>;
+pub struct Queue {
+    items: Vec<PathBuf>,
+    idx: usize,
+    looping: bool,
+}
+
+impl Queue {
+    pub fn new(looping: bool) -> Self {
+        Queue {
+            items: vec![],
+            idx: 0,
+            looping,
+        }
+    }
+}
+
+impl Iterator for Queue {
+    type Item = PathBuf;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.items.get(self.idx) {
+            Some(item) => {
+                let result = Some(item.clone());
+                self.idx += 1;
+                result
+            },
+            None if self.looping && !self.items.is_empty() => {
+                self.idx = 1;
+                Some(self.items.get(0).unwrap().clone())
+            },
+            None => None,
+        }
+    }
+}
 
 pub struct Controller {
-    req_rx: Receiver<ACRequest>,
+    req_rx: Receiver<ACReq>,
     rsp_tx: Sender<Result<()>>,
     state: AudioState,
     queue: Option<Queue>,
 }
 
 impl Controller {
-    pub fn new(req_rx: Receiver<ACRequest>, rsp_tx: Sender<Result<()>>) -> Self {
+    pub fn new(req_rx: Receiver<ACReq
+>, rsp_tx: Sender<Result<()>>) -> Self {
         Controller {
             req_rx,
             rsp_tx,
@@ -45,12 +85,20 @@ impl Controller {
         }
     }
 
-    pub fn run(&mut self) -> Result<()> {
-        let interval = Duration::from_millis(10);
+    pub fn run(&mut self, looping: bool) -> Result<()> {
+        let poll_interval = Duration::from_millis(10);
+        let mut queue = Queue::new(looping);
+        let output = OutputStreamBuilder::open_default_stream()
+            .expect("Failed to open default audio stream.");
+        let sink = Sink::connect_new(&output.mixer());
         loop {
             match self.req_rx.try_recv() {
-                Ok(ACReq::Audition) => (),
-                Ok(ACReq::Stop) => (),
+                Ok(ACReq::Audition(path)) => {
+                    let file = File::open(path)?;
+                    let src = Decoder::try_from(file)?;
+                    sink.append(src)
+                },
+                Ok(ACReq::Stop) => sink.stop(),
                 _ => (),
             }
             sleep(interval);

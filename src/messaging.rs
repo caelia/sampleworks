@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 /*
 use std::sync::mpsc::{Sender, SyncSender, Receiver, channel, sync_channel};
 use anyhow::{self, Result};
@@ -23,10 +24,10 @@ pub enum Position {
 }
 
 pub enum ACReq {
-    Audition,
-    QueueAdd,
-    QueueInsert,
-    QueueRemove,
+    Audition(PathBuf),
+    QueueAdd(PathBuf),
+    QueueInsert(PathBuf,usize),
+    QueueRemove(usize),
     PlayQueue,
     Pause,
     Resume,
