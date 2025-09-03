@@ -23,12 +23,14 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{Sender, Receiver, channel};
+use std::thread;
 
 use crate::audio::*;
 use crate::img::*;
 use crate::project::{Project, SourceSpec};
-use crate::ui::browser::DumbBrowser;
+use crate::ui::browser::SampleBrowser;
 use crate::config::SWConfig;
+use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
 const DEMO: bool = true;
 
@@ -63,7 +65,9 @@ fn main() -> Result<()> {
     };
 
     let src_path = cfg.demo_source_path;
+    println!("src_path: {:?}", src_path);
     let proj_path = cfg.default_project_path.join("demo");
+    println!("proj_path: {:?}", proj_path);
     if !proj_path.exists() {
         match std::fs::create_dir_all(&proj_path) {
             Ok(_) => (),
@@ -73,9 +77,19 @@ fn main() -> Result<()> {
 
     let _ = create_thumbs(src_path.clone(), proj_path.clone());
 
-    let browser = DumbBrowser::new(
+    let (req_tx, req_rx) = channel();
+    let (rsp_tx, rsp_rx) = channel();
+
+    let mut audio_controller = Controller::new(rsp_tx, req_rx);
+    thread::spawn(move || {
+        let _ = audio_controller.run(true);
+    });
+        
+    let browser = SampleBrowser::new(
         src_path,
-        proj_path.join("images")
+        proj_path.join("images"),
+        TxWrapper::new(req_tx),
+        RxWrapper::new(rsp_rx)
     );
     let _ = browser.run();
     Ok(())

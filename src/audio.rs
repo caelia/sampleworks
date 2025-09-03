@@ -68,18 +68,17 @@ impl Iterator for Queue {
 }
 
 pub struct Controller {
+    rsp_tx: Sender<ACRsp>,
     req_rx: Receiver<ACReq>,
-    rsp_tx: Sender<Result<()>>,
     state: AudioState,
     queue: Option<Queue>,
 }
 
 impl Controller {
-    pub fn new(req_rx: Receiver<ACReq
->, rsp_tx: Sender<Result<()>>) -> Self {
+    pub fn new(rsp_tx: Sender<ACRsp>, req_rx: Receiver<ACReq>) -> Self {
         Controller {
-            req_rx,
             rsp_tx,
+            req_rx,
             state: AudioState::Stopped,
             queue: None,
         }
@@ -87,7 +86,7 @@ impl Controller {
 
     pub fn run(&mut self, looping: bool) -> Result<()> {
         let poll_interval = Duration::from_millis(10);
-        let mut queue = Queue::new(looping);
+        // let mut queue = Queue::new(looping);
         let output = OutputStreamBuilder::open_default_stream()
             .expect("Failed to open default audio stream.");
         let sink = Sink::connect_new(&output.mixer());
@@ -101,7 +100,7 @@ impl Controller {
                 Ok(ACReq::Stop) => sink.stop(),
                 _ => (),
             }
-            sleep(interval);
+            sleep(poll_interval);
         }
     }
 
