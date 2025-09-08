@@ -13,56 +13,6 @@ use std::cmp::Ordering;
 use crate::img::*;
 use crate::audio::*;
 
-pub struct FileMapItem {
-    contents: (PathBuf, PathBuf),
-}
-
-impl FileMapItem {
-    fn img(&self) -> PathBuf {
-        self.contents.0.clone()
-    }
-}
-
-impl PartialEq for FileMapItem {
-    fn eq(&self, other: &FileMapItem) -> bool {
-        self.img() == other.img()
-    }
-}
-
-impl PartialOrd for FileMapItem {
-    fn partial_cmp(&self, other: &FileMapItem) -> Option<Ordering> {
-        if self == other {
-            Some(Ordering::Equal)
-        } else if self.img() > other.img() {
-            Some(Ordering::Greater)
-        } else if self.img() < other.img() {
-            Some(Ordering::Less)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct FileMap {
-    contents: BTreeSet<FileMapItem>,
-}
-
-impl FileMap {
-    pub fn new() -> Self {
-        FileMap { contents: BTreeSet::new() }
-    }
-
-    pub fn snd4img(&self, imgpath: &PathBuf) -> Option<&PathBuf> {
-        self.index.get(imgpath)
-    }
-
-    pub fn try_insert(&mut self, img: PathBuf, snd: PathBuf) -> Result<()> {
-        match self.index.insert(img, snd) {
-            Some(_) => Ok(()),
-            None => Err(anyhow!("Failed to insert '{:?}, {:?}' into file map.", img, snd)),
-        }
-    }
-}
 
 pub enum SourceSpec {
     Dir(PathBuf),
