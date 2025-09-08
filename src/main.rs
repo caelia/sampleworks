@@ -16,7 +16,7 @@ mod messaging;
 // use sndfile::{OpenOptions, ReadOptions};
 use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 use image::Rgb;
-use anyhow::Result;
+use anyhow::{Result, Error, anyhow};
 use configura;
 
 use std::fs::File;
@@ -39,7 +39,7 @@ const DEMO: bool = true;
 
 ///////////////////////////////////////////////////////////////////////
 
-fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
+fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
     let project = Project::new(
         SourceSpec::Dir(src_path),
         proj_path,
@@ -51,7 +51,7 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
 
     match files {
         Ok(fls) => {
-            project.create_thumbs(
+            let file_map = project.create_thumbs(
                 fls,
                 // (200, 80),
                 (800, 320),
@@ -59,7 +59,8 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
                 // Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 16, 60),
                 Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
                 Rgb([221, 221, 221])
-            )
+            ).unwrap();
+            Ok(file_map)
         },
         Err(e) => Err(e.into()),
     }
@@ -80,8 +81,6 @@ fn main() -> Result<()> {
         }
     }
 
-    let _ = create_thumbs(src_path.clone(), proj_path.clone());
-
     let (req_tx, req_rx) = channel();
     let (rsp_tx, rsp_rx) = channel();
 
@@ -90,12 +89,17 @@ fn main() -> Result<()> {
         let _ = audio_controller.run(true);
     });
         
-    let browser = SampleBrowser::new(
-        src_path,
-        proj_path.join("images"),
-        TxWrapper::new(req_tx),
-        RxWrapper::new(rsp_rx)
-    );
-    let _ = browser.run();
-    Ok(())
+    match create_thumbs(src_path.clone(), proj_path.clone()) {
+        Ok(file_map) => {
+            let browser = SampleBrowser::new(
+                src_path,
+                proj_path.join("images"),
+                TxWrapper::new(req_tx),
+                RxWrapper::new(rsp_rx)
+            );
+            let _ = browser.run(file_map);
+            Ok(())
+        },
+        Err(e) => Err(anyhow!(e))
+    }
 }

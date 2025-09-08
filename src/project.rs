@@ -101,7 +101,8 @@ impl Project {
             files: Vec<PathBuf>,
             size: (u32, u32),
             fg: Fill,
-            bg: Rgb<u8>) -> Result<()> {
+            bg: Rgb<u8>) -> Result<Vec<(PathBuf, PathBuf)>> {
+        let mut file_map = vec![];
         for fname in files {
             let (width, height) = size;
             let raw_data = stream_data(&fname);
@@ -116,8 +117,9 @@ impl Project {
             wf_img.draw(minmaxes);
             let path = self.get_image_path(&fname);
             wf_img.save(&path);
+            file_map.push((path, fname));
         }
         
-        Ok(())
+        Ok(file_map)
     }
 }

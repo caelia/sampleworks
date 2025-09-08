@@ -70,12 +70,13 @@ impl SampleBrowser {
         }
     }
 
-    pub fn run(&self) -> glib::ExitCode {
+    pub fn run(&self, file_map: Vec<(PathBuf, PathBuf)>) -> glib::ExitCode {
     // pub fn run(&self) -> glib::signal::SignalHandlerId {
         let app = Application::builder()
             .application_id("org.sampleworks.SWPrototype")
             .build();
 
+        /*
         let img_files = match self.img_dir.read_dir() {
             Ok(entries) => {
                 entries.map(|result| {
@@ -87,6 +88,7 @@ impl SampleBrowser {
             },
             Err(_) => vec![],
         };
+        */
 
         let tx = self.req_tx.clone();
         let _ = app.connect_activate(move |app| {
@@ -112,7 +114,8 @@ impl SampleBrowser {
                 .selection_mode(gtk::SelectionMode::None)
                 .build();
 
-            for file in &img_files {
+            // for file in &img_files {
+            /*
                 match file {
                     Some(path) => {
                         let img = Picture::for_filename(&path);
@@ -137,6 +140,27 @@ impl SampleBrowser {
                     },
                     None => (),
                 }
+            */
+            for (img_file, snd_file) in &file_map {
+                let img = Picture::for_filename(&img_file);
+                let ectrl_ck = gtk::GestureClick::new();
+                ectrl_ck.connect_released(clone!(
+                    #[strong] tx,
+                    move |_, _, _, _| {
+                        let _ = tx.send(ACReq::Stop);
+                    }
+                ));
+                let ectrl_lp = gtk::GestureLongPress::new();
+                ectrl_lp.connect_pressed(clone!(
+                    #[strong] snd_file,
+                    #[strong] tx,
+                    move |_, _, _| {
+                        let _ = tx.send(ACReq::Audition(snd_file.clone()));
+                    }
+                ));
+                img.add_controller(ectrl_ck);
+                img.add_controller(ectrl_lp);
+                fbox.insert(&img, -1);
             }
 
             let scrolled = gtk::ScrolledWindow::builder()
