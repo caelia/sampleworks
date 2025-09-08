@@ -24,6 +24,7 @@ use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::thread;
+use std::collections::HashMap;
 
 use crate::audio::*;
 use crate::img::*;
@@ -32,8 +33,11 @@ use crate::ui::browser::SampleBrowser;
 use crate::config::SWConfig;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
+///////////////////////////////////////////////////////////////////////
+/// TEMPORARY STUFF ///////////////////////////////////////////////////
 const DEMO: bool = true;
 
+///////////////////////////////////////////////////////////////////////
 
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
     let project = Project::new(
@@ -49,8 +53,11 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<()> {
         Ok(fls) => {
             project.create_thumbs(
                 fls,
-                (200, 80),
-                Fill::Gradient(Rgb([0, 0, 248]), Rgb([248, 0, 0]), 16, 60),
+                // (200, 80),
+                (800, 320),
+                // Fill::Gradient(Rgb([0, 0, 248]), Rgb([248, 0, 0]), 16, 60),
+                // Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 16, 60),
+                Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
                 Rgb([221, 221, 221])
             )
         },
