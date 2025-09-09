@@ -4,7 +4,7 @@
 
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, FlowBox, Image, Picture};
+use gtk::{Application, ApplicationWindow, FlowBox, Image, Picture, ContentFit};
 use gtk::glib;
 use glib::source::SourceId;
 use glib::clone;
@@ -27,6 +27,8 @@ use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 const CSS: &str = "
     picture {
         border: 1px solid #c0c0c0;
+        padding: 0;
+        margin: 0;
     }
 ";
 
@@ -110,7 +112,7 @@ impl SampleBrowser {
             let fbox = gtk::FlowBox::builder()
                 .valign(gtk::Align::Start)
                 .max_children_per_line(9)
-                .min_children_per_line(2)
+                .min_children_per_line(4)
                 .selection_mode(gtk::SelectionMode::None)
                 .build();
 
@@ -142,7 +144,13 @@ impl SampleBrowser {
                 }
             */
             for (img_file, snd_file) in &file_map {
-                let img = Picture::for_filename(&img_file);
+                // let img = Picture::for_filename(&img_file);
+                let img = Picture::builder()
+                    .hexpand(false)
+                    .vexpand(true)
+                    .content_fit(ContentFit::ScaleDown)
+                    .build();
+                img.set_filename(Some(img_file));
                 let ectrl_ck = gtk::GestureClick::new();
                 ectrl_ck.connect_released(clone!(
                     #[strong] tx,
