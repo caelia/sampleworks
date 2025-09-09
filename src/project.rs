@@ -4,6 +4,7 @@
 
 use anyhow::{Result, Error, anyhow};
 use image::Rgb;
+use blake3::hash as b3hash;
 
 use std::path::{Path, PathBuf};
 use std::fs::{create_dir, create_dir_all, remove_dir_all};
@@ -62,13 +63,20 @@ impl Project {
         Ok(())
     }
 
-    pub fn get_image_path(&self, sndfile_path: &PathBuf) -> PathBuf {
+    fn old_get_image_path(&self, sndfile_path: &PathBuf) -> PathBuf {
         let image_dir = self.proj_dir.join("images");
         let image_name_stem = sndfile_path
             .display()
             .to_string()
             .replace(std::path::MAIN_SEPARATOR_STR, "-");
         image_dir.join(PathBuf::from(image_name_stem).with_extension("png"))
+    }
+
+    pub fn get_image_path(&self, hash_str: String) -> (PathBuf, bool) {
+        let image_dir = self.proj_dir.join("images");
+        let path = image_dir.join(hash_str).with_extension("png");
+        let exists = path.is_file();
+        (path, exists)
     }
 
     pub fn get_src_files(&self) -> Result<Vec<PathBuf>> {
@@ -96,7 +104,7 @@ impl Project {
         Ok(files)
     }
 
-    pub fn create_thumbs(
+    pub fn get_thumbs(
             &self,
             files: Vec<PathBuf>,
             size: (u32, u32),
@@ -104,19 +112,25 @@ impl Project {
             bg: Rgb<u8>) -> Result<Vec<(PathBuf, PathBuf)>> {
         let mut file_map = vec![];
         for fname in files {
-            let (width, height) = size;
-            let raw_data = stream_data(&fname);
-            let nframes = raw_data.len();
+            let hash = match std::fs::read(&fname) {
+                Ok(bytes) => b3hash(bytes.as_slice()).to_string(),
+                Err(e) => return Err(anyhow!(e)),
+            };
+            let (path, exists) = self.get_image_path(hash);
+            if !exists {
+                let (width, height) = size;
+                let raw_data = stream_data(&fname);
+                let nframes = raw_data.len();
 
-            let data = get_min_maxes(raw_data, nframes, width as usize);
-            let (all_min, all_max, minmaxes) = data.clone();
-            let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
+                let data = get_min_maxes(raw_data, nframes, width as usize);
+                let (all_min, all_max, minmaxes) = data.clone();
+                let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
 
-            // UH-UH! Need to get rid of fg.clone()
-            let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
-            wf_img.draw(minmaxes);
-            let path = self.get_image_path(&fname);
-            wf_img.save(&path);
+                // UH-UH! Need to get rid of fg.clone()
+                let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
+                wf_img.draw(minmaxes);
+                wf_img.save(&path);
+            }
             file_map.push((path, fname));
         }
         

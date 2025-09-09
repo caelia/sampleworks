@@ -4,7 +4,7 @@
 
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, FlowBox, Image, Picture, ContentFit};
+use gtk::{Application, ApplicationWindow, Box, FlowBox, Image, Picture, ContentFit, Orientation};
 use gtk::glib;
 use glib::source::SourceId;
 use glib::clone;
@@ -27,8 +27,7 @@ use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 const CSS: &str = "
     picture {
         border: 1px solid #c0c0c0;
-        padding: 0;
-        margin: 0;
+        padding: 0 0 0 0;
     }
 ";
 
@@ -145,10 +144,11 @@ impl SampleBrowser {
             */
             for (img_file, snd_file) in &file_map {
                 // let img = Picture::for_filename(&img_file);
+                let bocks = Box::new(Orientation::Vertical, 0);
                 let img = Picture::builder()
-                    .hexpand(false)
-                    .vexpand(true)
-                    .content_fit(ContentFit::ScaleDown)
+                    // .hexpand(false)
+                    // .vexpand(true)
+                    // .content_fit(ContentFit::ScaleDown)
                     .build();
                 img.set_filename(Some(img_file));
                 let ectrl_ck = gtk::GestureClick::new();
@@ -168,7 +168,8 @@ impl SampleBrowser {
                 ));
                 img.add_controller(ectrl_ck);
                 img.add_controller(ectrl_lp);
-                fbox.insert(&img, -1);
+                bocks.append(&img);
+                fbox.insert(&bocks, -1);
             }
 
             let scrolled = gtk::ScrolledWindow::builder()

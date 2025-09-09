@@ -44,14 +44,14 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
         SourceSpec::Dir(src_path),
         proj_path,
     );
-    let proj_result = project.init(true);
+    // let proj_result = project.init(true);
     // for fname in args.skip(1) {
 
     let files = project.get_src_files();
 
     match files {
         Ok(fls) => {
-            let file_map = project.create_thumbs(
+            let file_map = project.get_thumbs(
                 fls,
                 // (200, 80),
                 (800, 320),
