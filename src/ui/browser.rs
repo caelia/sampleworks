@@ -27,6 +27,7 @@ use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 const CSS: &str = "
     picture {
         border: 1px solid #c0c0c0;
+        min-height: 60px;
         padding: 0 0 0 0;
     }
 ";
@@ -109,10 +110,12 @@ impl SampleBrowser {
             );
 
             let fbox = gtk::FlowBox::builder()
+                .orientation(Orientation::Horizontal)
                 .valign(gtk::Align::Start)
+                .halign(gtk::Align::Center)
                 .max_children_per_line(9)
-                .min_children_per_line(4)
-                .selection_mode(gtk::SelectionMode::None)
+                .min_children_per_line(2)
+                .selection_mode(gtk::SelectionMode::Multiple)
                 .build();
 
             // for file in &img_files {
@@ -144,11 +147,12 @@ impl SampleBrowser {
             */
             for (img_file, snd_file) in &file_map {
                 // let img = Picture::for_filename(&img_file);
-                let bocks = Box::new(Orientation::Vertical, 0);
                 let img = Picture::builder()
-                    // .hexpand(false)
-                    // .vexpand(true)
-                    // .content_fit(ContentFit::ScaleDown)
+                    // .width_request(200)
+                    // .can_shrink(false)
+                    .hexpand(false)
+                    .vexpand(true)
+                    .content_fit(ContentFit::Contain)
                     .build();
                 img.set_filename(Some(img_file));
                 let ectrl_ck = gtk::GestureClick::new();
@@ -168,12 +172,12 @@ impl SampleBrowser {
                 ));
                 img.add_controller(ectrl_ck);
                 img.add_controller(ectrl_lp);
-                bocks.append(&img);
-                fbox.insert(&bocks, -1);
+                fbox.insert(&img, -1);
             }
 
             let scrolled = gtk::ScrolledWindow::builder()
                 .hscrollbar_policy(gtk::PolicyType::Never)
+                .vscrollbar_policy(gtk::PolicyType::Always)
                 .min_content_width(400)
                 .child(&fbox)
                 .build();

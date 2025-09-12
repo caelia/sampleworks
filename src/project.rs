@@ -101,6 +101,8 @@ impl Project {
             }
         }
 
+        files.sort_unstable();
+
         Ok(files)
     }
 
