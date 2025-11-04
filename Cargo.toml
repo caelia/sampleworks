@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 # sndfile = "0.1"
 # cpal = "0.15"
-iced = { version = "0.13", features = ["image", "canvas"] }
+iced = { version = "0.13", features = ["image", "canvas", "advanced"] }
 rodio = "0.21"
 image = "0.25"
 anyhow = "1.0"

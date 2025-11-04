@@ -2,13 +2,6 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use gtk4 as gtk;
-use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Box, FlowBox, Image, Picture, ContentFit, Orientation};
-use gtk::glib;
-use glib::source::SourceId;
-use glib::clone;
-
 use rodio::{Decoder, OutputStream, source::Source};
 use anyhow::{Result, Error, anyhow};
 
@@ -73,7 +66,6 @@ impl SampleBrowser {
     }
 
     pub fn run(&self, file_map: Vec<(PathBuf, PathBuf)>) -> glib::ExitCode {
-    // pub fn run(&self) -> glib::signal::SignalHandlerId {
         let app = Application::builder()
             .application_id("org.sampleworks.SWPrototype")
             .build();
@@ -118,38 +110,8 @@ impl SampleBrowser {
                 .selection_mode(gtk::SelectionMode::Multiple)
                 .build();
 
-            // for file in &img_files {
-            /*
-                match file {
-                    Some(path) => {
-                        let img = Picture::for_filename(&path);
-                        let ectrl_ck = gtk::GestureClick::new();
-                        ectrl_ck.connect_released(clone!(
-                            #[strong] tx,
-                            move |_, _, _, _| {
-                                let _ = tx.send(ACReq::Stop);
-                            }
-                        ));
-                        let ectrl_lp = gtk::GestureLongPress::new();
-                        ectrl_lp.connect_pressed(clone!(
-                            #[strong] path,
-                            #[strong] tx,
-                            move |_, _, _| {
-                                let _ = tx.send(ACReq::Audition(path.clone()));
-                            }
-                        ));
-                        img.add_controller(ectrl_ck);
-                        img.add_controller(ectrl_lp);
-                        fbox.insert(&img, -1);
-                    },
-                    None => (),
-                }
-            */
             for (img_file, snd_file) in &file_map {
-                // let img = Picture::for_filename(&img_file);
                 let img = Picture::builder()
-                    // .width_request(200)
-                    // .can_shrink(false)
                     .hexpand(false)
                     .vexpand(true)
                     .content_fit(ContentFit::Contain)
@@ -188,10 +150,4 @@ impl SampleBrowser {
 
         app.run()
     }
-
-    /*
-    fn create_thumbnail(&self, img_path: &PathBuf) -> Image {
-        Image::from_file(img_path)
-    }
-    */
 }
