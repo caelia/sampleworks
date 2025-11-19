@@ -13,6 +13,7 @@ use std::cmp::Ordering;
 
 use crate::img::*;
 use crate::audio::*;
+use crate::common::{SoundObject, snd_object};
 
 
 pub enum SourceSpec {
@@ -37,16 +38,19 @@ pub struct Project {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
     pub export_dirs: HashMap<String, PathBuf>,
+    pub objects: HashMap<String, SoundObject>,
 }
 
 impl Project {
     pub fn new(source: SourceSpec, proj_dir: PathBuf) -> Self {
         source.validate_source();
         let export_dirs = HashMap::new();
+        let objects = HashMap::new();
         Project {
             source,
             proj_dir,
             export_dirs,
+            objects
         }
     }
 
@@ -137,5 +141,9 @@ impl Project {
         }
         
         Ok(file_map)
+    }
+
+    pub fn get_object(&self, id: String) -> Option<&SoundObject> {
+        self.objects.get(&id)
     }
 }
