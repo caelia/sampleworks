@@ -92,12 +92,11 @@ fn main() -> Result<()> {
     match create_thumbs(src_path.clone(), proj_path.clone()) {
         Ok(file_map) => {
             let browser = SampleBrowser::new(
-                src_path,
-                proj_path.join("images"),
+                file_map,
                 TxWrapper::new(req_tx),
                 RxWrapper::new(rsp_rx)
             );
-            let _ = browser.run(file_map);
+            // let _ = browser.run(file_map);
             Ok(())
         },
         Err(e) => Err(anyhow!(e))
