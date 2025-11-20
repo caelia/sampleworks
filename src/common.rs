@@ -14,9 +14,11 @@ pub enum AudioFormat {
     AAC
 }
 
+
+#[derive(Debug, Clone)]
 pub struct SoundObject {
-    content: PathBuf,    // audio file
-    thumbnail: Option<PathBuf>,  // image file
+    pub content: PathBuf,    // audio file
+    pub thumbnail: Option<PathBuf>,  // image file
 }
 
 impl SoundObject {
@@ -30,7 +32,7 @@ pub fn snd_object(fname: PathBuf) -> Result<(String, SoundObject)> {
         Ok(bytes) => b3hash(bytes.as_slice()).to_string(),
         Err(e) => return Err(anyhow!(e)),
     };
-    Ok(SoundObject::new(fname))
+    Ok((id, SoundObject::new(fname)))
 }
 
 /*

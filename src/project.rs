@@ -16,8 +16,9 @@ use crate::audio::*;
 use crate::common::{SoundObject, snd_object};
 
 
+#[derive(Debug, Clone)]
 pub enum SourceSpec {
-    Dir(PathBuf),
+    Dir(Box<PathBuf>),
     Files(Vec<PathBuf>),
 }
 
@@ -34,6 +35,14 @@ impl SourceSpec {
     }
 }
 
+pub fn get_image_path(proj_dir: PathBuf, hash_str: &String) -> (PathBuf, bool) {
+    let image_dir = proj_dir.join("images");
+    let path = image_dir.join(hash_str).with_extension("png");
+    let exists = path.is_file();
+    (path, exists)
+}
+
+#[derive(Debug, Clone)]
 pub struct Project {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
@@ -76,7 +85,7 @@ impl Project {
         image_dir.join(PathBuf::from(image_name_stem).with_extension("png"))
     }
 
-    pub fn get_image_path(&self, hash_str: String) -> (PathBuf, bool) {
+    pub fn get_image_path(&self, hash_str: &String) -> (PathBuf, bool) {
         let image_dir = self.proj_dir.join("images");
         let path = image_dir.join(hash_str).with_extension("png");
         let exists = path.is_file();
@@ -122,7 +131,7 @@ impl Project {
                 Ok(bytes) => b3hash(bytes.as_slice()).to_string(),
                 Err(e) => return Err(anyhow!(e)),
             };
-            let (path, exists) = self.get_image_path(hash);
+            let (path, exists) = self.get_image_path(&hash);
             if !exists {
                 let (width, height) = size;
                 let raw_data = stream_data(&fname);
@@ -141,6 +150,70 @@ impl Project {
         }
         
         Ok(file_map)
+    }
+
+    pub fn load_objects(&mut self) -> Result<()> {
+        let mut files = vec![];
+        match self.source {
+            SourceSpec::Files(ref files_) => files = files_.to_vec(),
+            SourceSpec::Dir(ref dir) => {
+                let read_result = dir.read_dir();
+                match read_result {
+                    Ok(entries) => {
+                        for entry in entries {
+                            match entry {
+                                Ok(ent) => {
+                                    files.push(dir.join(ent.file_name()));
+                                },
+                                Err(e) => return Err(e.into())
+                            }
+                        }
+                    },
+                    Err(e) => return Err(e.into()),
+                }
+            }
+        }
+        files.sort_unstable();
+        
+        for f in files {
+            let (id, obj) = snd_object(f).unwrap();
+            self.objects.insert(id, obj);
+        }
+        Ok(())
+    }
+
+    pub fn load_thumbs(
+            &mut self,
+            size: (u32, u32),
+            fg: Fill,
+            bg: Rgb<u8>) {
+        // for id in self.objects.keys() {
+        // let objects = self.objects;
+        for (id, obj) in self.objects.iter_mut() {
+            // let (path, exists) = self.get_image_path(id);
+            let (path, exists) = get_image_path(self.proj_dir.clone(), id);
+            if !exists {
+                let (width, height) = size;
+                let raw_data = stream_data(&obj.content);
+                let nframes = raw_data.len();
+
+                let data = get_min_maxes(raw_data, nframes, width as usize);
+                let (all_min, all_max, minmaxes) = data.clone();
+                let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
+
+                // UH-UH! Need to get rid of fg.clone()
+                let mut wf_img = WaveformImg::new(width, height, vscale, fg.clone(), bg);
+                wf_img.draw(minmaxes);
+                wf_img.save(&path);
+            }
+            match obj {
+                SoundObject { thumbnail: Some(pth), .. } => (),
+                o => {
+                    // obj = SoundObject { content: o.content, thumbnail: Some(path)};
+                    o.thumbnail = Some(path)
+                }
+            }
+        }
     }
 
     pub fn get_object(&self, id: String) -> Option<&SoundObject> {

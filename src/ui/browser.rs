@@ -5,7 +5,7 @@
 // use anyhow::{Result, Error, anyhow};
 
 use iced::widget::{Row, row};
-use iced::{Element, Result, Task};
+use iced::{Element, Result, Task, Color};
 
 use std::fs::File;
 use std::io::BufReader;
@@ -18,46 +18,72 @@ use std::time::Duration;
 use std::thread::sleep;
 
 use super::wavethumb;
+use super::Message;
+use crate::common::SoundObject;
+use crate::project::Project;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
-#[derive(Debug, Clone)]
-pub enum Message {
-    NewMap(Vec<(PathBuf, PathBuf)>),
-    ThumbMsg(wavethumb::Message),
-}
 
 pub struct SampleBrowser {
     // Vec of (img_file, snd_file)
-    file_map: Vec<(PathBuf, PathBuf)>,
+    // project: &'a Rc<Project>,
+    project: Rc<Project>,
+    // file_map: Vec<(PathBuf, PathBuf)>,
     req_tx: Rc<TxWrapper<ACReq>>,
     rsp_rx: Rc<RxWrapper<ACRsp>>,
+    playing: Option<String>,
 }
 
 impl SampleBrowser {
-    pub fn new(file_map: Vec<(PathBuf, PathBuf)>,
-            tx: TxWrapper<ACReq>, rx: RxWrapper<ACRsp>)
+    // pub fn new(project: &'a Project, file_map: Vec<(PathBuf, PathBuf)>,
+    // pub fn new(project: &'a Rc<Project>,
+    pub fn new(project: Rc<Project>,
+            tx: TxWrapper<ACReq>,
+            rx: RxWrapper<ACRsp>)
             -> Self {
         Self {
-            file_map,
+            project,
+            // file_map,
             req_tx: Rc::new(tx),
-            rsp_rx: Rc::new(rx)
+            rsp_rx: Rc::new(rx),
+            playing: None,
         }
     }
 
     pub fn view(&self) -> Element<Message> {
-        let thumbs = self.file_map.into_iter().map(|(img_file, snd_file)| {
-            wavethumb::WaveThumb::new(snd_file, img_file)
+        let thumbs = self.project.objects.iter().map(|(id, obj)| {
+            let img_file = obj.thumbnail.clone().unwrap();
+            let wt: Element<_> = wavethumb::WaveThumb::new(
+                id.clone(), obj.content.clone(), img_file
+            ).into();
+            wt.explain(Color::BLACK)
         }).collect::<Vec<_>>();
 
         Row::from_vec(thumbs)
-            .spacing(12)
+            // .spacing(12)
+            .wrap()
             .into()
     }
 
     pub fn update(&mut self, msg: Message) -> Task<Message> {
         match msg {
-            Message::NewMap(fmap) => self.file_map = fmap,
-            _ => ()
+            Message::Toggle(id) => {
+                let (stop, start) = match &self.playing {
+                    Some(id_) if *id_ == id => (true, false),
+                    Some(id_) => (true, true),
+                    None => (false, true),
+                };
+                if stop {
+                    self.req_tx.send(ACReq::Stop);
+                }
+                if start {
+                    if let Some(obj) = self.project.get_object(id) {
+                        let snd_file = obj.content.clone();
+                        self.req_tx.send(ACReq::Audition(snd_file));
+                    }
+                }
+            },
+            _ => (),
         }
         Task::none()
     }

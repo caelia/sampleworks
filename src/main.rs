@@ -19,8 +19,11 @@ use image::Rgb;
 use anyhow::{Result, Error, anyhow};
 use configura;
 
+use iced::{Task, application};
+
 use std::fs::File;
 use std::io::BufReader;
+use std::rc::Rc;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::thread;
@@ -41,7 +44,7 @@ const DEMO: bool = true;
 
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
     let project = Project::new(
-        SourceSpec::Dir(src_path),
+        SourceSpec::Dir(Box::new(src_path)),
         proj_path,
     );
     // let proj_result = project.init(true);
@@ -53,10 +56,7 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
         Ok(fls) => {
             let file_map = project.get_thumbs(
                 fls,
-                // (200, 80),
                 (800, 320),
-                // Fill::Gradient(Rgb([0, 0, 248]), Rgb([248, 0, 0]), 16, 60),
-                // Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 16, 60),
                 Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
                 Rgb([221, 221, 221])
             ).unwrap();
@@ -66,20 +66,25 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
     }
 }
 
-fn main() -> Result<()> {
+// fn main() -> anyhow::Result<()> {
+fn main() -> iced::Result {
     let cfg = match configura::load_config::<SWConfig>() {
         Ok(config) => config,
         Err(_) => SWConfig::default()
     };
-
-    let src_path = cfg.demo_source_path;
-    let proj_path = cfg.default_project_path.join("demo");
+    let src_path = &cfg.demo_source_path;
+    let proj_path = &cfg.default_project_path.join("demo");
     if !proj_path.exists() {
         match std::fs::create_dir_all(&proj_path) {
             Ok(_) => (),
             Err(_) => panic!("failed to create project path")
         }
     }
+
+    let mut project = Project::new(
+        SourceSpec::Dir(Box::new(src_path.clone())),
+        proj_path.clone(),
+    );
 
     let (req_tx, req_rx) = channel();
     let (rsp_tx, rsp_rx) = channel();
@@ -89,9 +94,31 @@ fn main() -> Result<()> {
         let _ = audio_controller.run(true);
     });
         
+    let _ = project.load_objects();
+    project.load_thumbs(
+        (800, 320),
+        Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
+        Rgb([221, 221, 221])
+    );
+
+    /*
+    let browser = SampleBrowser::new(
+        &project, TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
+    );
+    */
+    application("SampleWorks Prototype", SampleBrowser::update, SampleBrowser::view)
+        .run_with(move || (
+            SampleBrowser::new(
+                Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
+            ),
+            Task::none()
+        ))
+}
+    /*
     match create_thumbs(src_path.clone(), proj_path.clone()) {
         Ok(file_map) => {
             let browser = SampleBrowser::new(
+                &project,
                 file_map,
                 TxWrapper::new(req_tx),
                 RxWrapper::new(rsp_rx)
@@ -101,4 +128,4 @@ fn main() -> Result<()> {
         },
         Err(e) => Err(anyhow!(e))
     }
-}
+    */

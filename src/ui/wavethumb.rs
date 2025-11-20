@@ -9,73 +9,50 @@ use iced::widget::{text, image, mouse_area, row, Column, column};
 
 use std::path::PathBuf;
 use std::rc::Rc;
+use std::borrow::Cow;
 
 use crate::messaging::{ACReq, ACRsp, TxWrapper};
+use super::Message;
+
 
 #[derive(Debug, Clone)]
-pub enum Message {
-    Play(PathBuf),
-    Stop,
-    Toggle,
-}
-
-#[derive(Debug, Clone)]
-pub struct WaveThumb<W: Widget<_, _, _> {
+pub struct WaveThumb {
+    id: String,
     snd_file: PathBuf,
     img_file: PathBuf,
-    container: Option<W>,
-    // req_tx: Rc<TxWrapper<ACReq>>,
     playing: bool,
 }
 
 impl WaveThumb {
     pub fn new(
+        id: String,
         snd_file: PathBuf,
         img_file: PathBuf,
-        // tx: TxWrapper<ACReq>,
     ) -> Self {
-        // WaveThumb { snd_file, img_file, req_tx: Rc::new(tx), playing: false }
-        WaveThumb { snd_file, img_file, container: None, playing: false }
+        WaveThumb { id, snd_file, img_file, playing: false }
     }
 
-    pub fn view(&mut self) -> Element<Message> {
-        let ifile_name = self.img_file.to_string_lossy();
-        let sfile_name = self.snd_file.file_name().unwrap().to_string_lossy();
-        let container = column![
-            mouse_area(
-                image(&self.img_file)
-                    .width(320),
-            ).on_press(Message::Toggle),
-            text(sfile_name)
-        ]
-        .spacing(8);
-        self.container = Some(container.clone());
-        container.into()
-    }
-
-    pub fn update(&mut self, msg: Message) -> Task<Message> {
-        match msg {
-            Message::Toggle => {
-                self.toggle();
-            },
-            _ => ()
-        }
-        println!("WaveThumb::update - {}", self.playing);
-        Task::none()
-    }
-
-    fn toggle(&mut self) -> bool {
-        let new_state = !self.playing;
-        self.playing = new_state;
-        new_state
+    pub fn filename(&self) -> Cow<str> {
+        self.snd_file.file_name().unwrap().to_string_lossy()
     }
 }
 
-impl<'a, Message> From<WaveThumb> for Element<'a, Message>
+impl<'a> From<WaveThumb> for Element<'a, Message>
 where Message: Clone + 'a,
 {
     fn from(thumb: WaveThumb) -> Self {
-        thumb.container.into()
+        let ifile_name = thumb.img_file.to_string_lossy();
+        // let sfile_name = thumb.snd_file.clone().file_name().unwrap().to_string_lossy();
+        let sfile_name = thumb.filename().into_owned();
+        column![
+            mouse_area(
+                image(&thumb.img_file)
+                    .width(320)
+            ).on_press(Message::Toggle(thumb.id)),
+            text(sfile_name)
+        ]
+        .spacing(8)
+        .into()
     }
 }
 
