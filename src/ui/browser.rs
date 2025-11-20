@@ -4,8 +4,8 @@
 
 // use anyhow::{Result, Error, anyhow};
 
-use iced::widget::{Row, row};
-use iced::{Element, Result, Task, Color};
+use iced::widget::{Row, row, scrollable, center, container};
+use iced::{Element, Result, Task, Color, Length};
 
 use std::fs::File;
 use std::io::BufReader;
@@ -53,16 +53,23 @@ impl SampleBrowser {
     pub fn view(&self) -> Element<Message> {
         let thumbs = self.project.objects.iter().map(|(id, obj)| {
             let img_file = obj.thumbnail.clone().unwrap();
-            let wt: Element<_> = wavethumb::WaveThumb::new(
+            wavethumb::WaveThumb::new(
                 id.clone(), obj.content.clone(), img_file
-            ).into();
-            wt.explain(Color::BLACK)
+            ).into()
         }).collect::<Vec<_>>();
 
-        Row::from_vec(thumbs)
-            // .spacing(12)
-            .wrap()
-            .into()
+        scrollable(
+            container(
+                Row::from_vec(thumbs)
+                    .spacing(17)
+                    .padding(10)
+                    // .width(Length::Fill)
+                    .wrap()
+            )
+            .center_x(Length::Fill)
+        )
+        .width(Length::Fill)
+        .into()
     }
 
     pub fn update(&mut self, msg: Message) -> Task<Message> {

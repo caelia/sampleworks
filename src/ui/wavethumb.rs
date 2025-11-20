@@ -3,9 +3,9 @@
 #![allow(dead_code)]
 
 // use iced::advanced::{image::Image};
-use iced::{Element, Task, Result};
+use iced::{Element, Task, Result, Length, Alignment};
 use iced::advanced::Widget;
-use iced::widget::{text, image, mouse_area, row, Column, column};
+use iced::widget::{text, image, mouse_area, row, Column, column, horizontal_rule};
 
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -14,6 +14,15 @@ use std::borrow::Cow;
 use crate::messaging::{ACReq, ACRsp, TxWrapper};
 use super::Message;
 
+
+fn trim_text(txt: String, limit: usize) -> String {
+    if txt.len() > limit {
+        let limit = limit - 6;
+        format!("{} ...", &txt[..limit])
+    } else {
+        txt
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct WaveThumb {
@@ -49,32 +58,13 @@ where Message: Clone + 'a,
                 image(&thumb.img_file)
                     .width(320)
             ).on_press(Message::Toggle(thumb.id)),
-            text(sfile_name)
+            text(trim_text(sfile_name, 42))
+                .width(Length::Fill)
+                .align_x(Alignment::Center),
+            horizontal_rule(1)
         ]
-        .spacing(8)
+        .width(Length::Shrink)
+        .spacing(4)
         .into()
     }
 }
-
-/*
-pub fn view(thumb: &mut WaveThumb) -> Element<Message> {
-    let name = match thumb.snd_file.file_name() {
-        Some(nm) => nm.display().to_string(),
-        None => "Unknown".to_string(),
-    };
-    mouse_area(
-        column![
-            image(thumb.img_file.clone()),
-            text(name)
-        ]
-    )
-    .on_press(
-        if thumb.toggle() {
-            Message::Play(thumb.snd_file.clone())
-        } else {
-            Message::Stop
-        }
-    )
-    .into()
-}
-*/
