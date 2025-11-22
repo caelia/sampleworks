@@ -40,6 +40,34 @@ use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 /// TEMPORARY STUFF ///////////////////////////////////////////////////
 const DEMO: bool = true;
 
+fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
+   println!( 
+ r#"
+======================================================================  
+|                                                                    |
+|    Welcome to the SampleWorks demo!                                |
+|    --------------------------------                                |
+|                                                                    |
+|    A collection of sound samples is being installed in             |
+|    {:?}.   |
+|                                                                    |
+|    You may also place your own samples in this directory, and they |
+|    will be detected and displayed by SampleWorks.                  |
+|                                                                    |
+|    Thumbnail images will be generated in                           |
+|    {:?}.   |
+|                                                                    |
+|    If you like any of the provided samples and wish to use them    |
+|    in your own projects, please see 'demo_samples/LICENSE.txt'     |
+|    for licensing info.                                             |
+|                                                                    |
+======================================================================
+"#,
+    src_path,
+    proj_path
+    );
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
@@ -70,6 +98,22 @@ fn main() -> iced::Result {
         Err(_) => SWConfig::default()
     };
     let src_path = &cfg.demo_source_path;
+    if !src_path.exists() {
+        match std::fs::create_dir_all(&src_path) {
+            Ok(_) => (),
+            Err(_) => panic!("failed to create source path")
+        }
+    }
+    let dir_iter = std::fs::read_dir(&cfg.demo_source_source)
+        .expect("Oops! Can't read demo sample directory.");
+    for entry in dir_iter {
+        let entry = entry.expect("error reading dir entry");
+        let src = entry.path();
+        let fname = entry.file_name();
+        let dest = src_path.join(&fname);
+        std::fs::copy(src, dest)
+            .expect(format!("failed to copy '{:?}'", fname).as_str());
+    }
     let proj_path = &cfg.default_project_path.join("demo");
     if !proj_path.exists() {
         match std::fs::create_dir_all(&proj_path) {
@@ -77,6 +121,8 @@ fn main() -> iced::Result {
             Err(_) => panic!("failed to create project path")
         }
     }
+
+    demo_msg(&src_path, &proj_path);
 
     let mut project = Project::new(
         SourceSpec::Dir(Box::new(src_path.clone())),

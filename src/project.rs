@@ -172,6 +172,9 @@ impl Project {
         files.sort_unstable();
         
         for f in files {
+            if f.extension().unwrap() == "txt" {
+                continue;
+            }
             match SoundObject::new(f.clone()) {
                 Ok(obj) => {
                     let id = f.file_name().unwrap().to_string_lossy().into_owned();

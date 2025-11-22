@@ -10,6 +10,7 @@ pub struct SWConfig {
     pub default_project_path: PathBuf,
     pub source_paths: Vec<PathBuf>,
     pub demo_source_path: PathBuf,
+    pub demo_source_source: PathBuf,
     pub audio_cache_path: PathBuf,
     pub image_cache_path: PathBuf,
     pub default_cache_format: AudioFormat,
@@ -29,7 +30,8 @@ impl Default for SWConfig {
         let pdirs = project_dirs().expect("failed to get project dirs struct");
         let udirs = UserDirs::new().unwrap();
         let default_project_path = udirs.document_dir().unwrap().join("sampleworks");
-        let demo_source_path = pdirs.data_dir().join("sample_data");
+        let demo_source_path = pdirs.data_dir().join("demo_samples");
+        let demo_source_source = PathBuf::from("demo_samples");
         let source_paths = vec![demo_source_path.clone()];
         let audio_cache_path = pdirs.cache_dir().join("audio");
         let image_cache_path = pdirs.cache_dir().join("images");
@@ -39,6 +41,7 @@ impl Default for SWConfig {
             default_project_path,
             source_paths,
             demo_source_path,
+            demo_source_source,
             audio_cache_path,
             image_cache_path,
             default_cache_format,
