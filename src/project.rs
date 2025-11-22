@@ -8,7 +8,8 @@ use blake3::hash as b3hash;
 
 use std::path::{Path, PathBuf};
 use std::fs::{create_dir, create_dir_all, remove_dir_all};
-use std::collections::{HashMap, BTreeSet};
+// use std::collections::{HashMap, BTreeSet};
+use std::collections::{HashMap, BTreeMap};
 use std::cmp::Ordering;
 
 use crate::img::*;
@@ -47,14 +48,14 @@ pub struct Project {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
     pub export_dirs: HashMap<String, PathBuf>,
-    pub objects: HashMap<String, SoundObject>,
+    pub objects: BTreeMap<String, SoundObject>,
 }
 
 impl Project {
     pub fn new(source: SourceSpec, proj_dir: PathBuf) -> Self {
         source.validate_source();
         let export_dirs = HashMap::new();
-        let objects = HashMap::new();
+        let objects = BTreeMap::new();
         Project {
             source,
             proj_dir,

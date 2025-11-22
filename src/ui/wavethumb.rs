@@ -58,7 +58,7 @@ where Message: Clone + 'a,
                 image(&thumb.img_file)
                     .width(320)
             ).on_press(Message::Toggle(thumb.id)),
-            text(trim_text(sfile_name, 42))
+            text(trim_text(sfile_name, 38))
                 .width(Length::Fill)
                 .align_x(Alignment::Center),
             horizontal_rule(1)
