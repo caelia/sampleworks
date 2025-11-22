@@ -1,44 +1,34 @@
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 mod common;
 mod config;
 mod audio;
 mod img;
 mod project;
 mod ui;
-mod app_data;
-mod caching;
 mod util;
 mod messaging;
 
 // use sndfile::{OpenOptions, ReadOptions};
-use rodio::{Decoder, decoder::DecoderError, source::Source}; 
 use image::Rgb;
-use anyhow::{Result, Error, anyhow};
+use anyhow::Result;
 use configura;
 
 use iced::{Task, application};
 
-use std::fs::File;
-use std::io::BufReader;
 use std::rc::Rc;
-use std::path::{Path, PathBuf};
-use std::sync::mpsc::{Sender, Receiver, channel};
+use std::path::PathBuf;
+use std::sync::mpsc::channel;
 use std::thread;
-use std::collections::HashMap;
 
 use crate::audio::*;
 use crate::img::*;
 use crate::project::{Project, SourceSpec};
 use crate::ui::browser::SampleBrowser;
 use crate::config::SWConfig;
-use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
+use crate::messaging::{TxWrapper, RxWrapper};
 
 ///////////////////////////////////////////////////////////////////////
 /// TEMPORARY STUFF ///////////////////////////////////////////////////
-const DEMO: bool = true;
+// const DEMO: bool = true;
 
 fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
    println!( 
@@ -70,6 +60,7 @@ fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
 
 ///////////////////////////////////////////////////////////////////////
 
+/*
 fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
     let project = Project::new(
         SourceSpec::Dir(Box::new(src_path)),
@@ -91,6 +82,7 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
         Err(e) => Err(e.into()),
     }
 }
+*/
 
 fn main() -> iced::Result {
     let cfg = match configura::load_config::<SWConfig>() {

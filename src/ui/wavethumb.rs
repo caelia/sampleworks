@@ -1,17 +1,11 @@
-#![allow(unused_imports)]
-#![allow(unused_variables)]
 #![allow(dead_code)]
 
 // use iced::advanced::{image::Image};
-use iced::{Element, Task, Result, Length, Alignment};
-use iced::advanced::Widget;
-use iced::widget::{text, image, mouse_area, row, Column, column, horizontal_rule};
+use iced::{Element, Length, Alignment};
+use iced::widget::{text, image, mouse_area, column, horizontal_rule};
 
 use std::path::PathBuf;
-use std::rc::Rc;
-use std::borrow::Cow;
 
-use crate::messaging::{ACReq, ACRsp, TxWrapper};
 use super::Message;
 
 

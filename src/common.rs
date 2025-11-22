@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use blake3::hash as b3hash;
 use anyhow::{anyhow, Result};
 
-use std::thread::JoinHandle;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]

@@ -1,4 +1,4 @@
-use configura::{Config, Format, formats::JsonFormat, load_config};
+use configura::{Config, formats::JsonFormat};
 use directories::{UserDirs, ProjectDirs};
 use serde::{Deserialize, Serialize};
 use anyhow::{Result, anyhow};
