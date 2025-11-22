@@ -131,7 +131,7 @@ fn main() -> iced::Result {
         
     let _ = project.load_objects();
     project.load_thumbs(
-        (800, 320),
+        (1410, 564),
         Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
         Rgb([221, 221, 221])
     );
