@@ -13,7 +13,7 @@ use std::cmp::Ordering;
 
 use crate::img::*;
 use crate::audio::*;
-use crate::common::{SoundObject, snd_object};
+use crate::common::SoundObject;
 
 
 #[derive(Debug, Clone)]
@@ -176,8 +176,13 @@ impl Project {
         files.sort_unstable();
         
         for f in files {
-            let (id, obj) = snd_object(f).unwrap();
-            self.objects.insert(id, obj);
+            match SoundObject::new(f.clone()) {
+                Ok(obj) => {
+                    let id = f.file_name().unwrap().to_string_lossy().into_owned();
+                    self.objects.insert(id.clone(), obj);
+                },
+                Err(e) => return Err(anyhow!(e)),
+            }
         }
         Ok(())
     }
@@ -198,7 +203,8 @@ impl Project {
                 let nframes = raw_data.len();
 
                 let data = get_min_maxes(raw_data, nframes, width as usize);
-                let (all_min, all_max, minmaxes) = data.clone();
+                // let (all_min, all_max, minmaxes) = data.clone();
+                let (all_min, all_max, minmaxes) = data;
                 let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
 
                 // UH-UH! Need to get rid of fg.clone()
