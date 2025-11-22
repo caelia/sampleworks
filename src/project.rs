@@ -216,7 +216,7 @@ impl Project {
         }
     }
 
-    pub fn get_object(&self, id: String) -> Option<&SoundObject> {
-        self.objects.get(&id)
+    pub fn get_object(&self, id: &String) -> Option<&SoundObject> {
+        self.objects.get(id)
     }
 }

@@ -82,11 +82,13 @@ impl SampleBrowser {
                 };
                 if stop {
                     self.req_tx.send(ACReq::Stop);
+                    self.playing = None;
                 }
                 if start {
-                    if let Some(obj) = self.project.get_object(id) {
+                    if let Some(obj) = self.project.get_object(&id) {
                         let snd_file = obj.content.clone();
                         self.req_tx.send(ACReq::Audition(snd_file));
+                        self.playing = Some(id);
                     }
                 }
             },
