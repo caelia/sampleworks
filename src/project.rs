@@ -1,14 +1,9 @@
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use anyhow::{Result, Error, anyhow};
 use image::Rgb;
 use blake3::hash as b3hash;
 
 use std::path::{Path, PathBuf};
 use std::fs::{create_dir, create_dir_all, remove_dir_all};
-// use std::collections::{HashMap, BTreeSet};
 use std::collections::{HashMap, BTreeMap};
 use std::cmp::Ordering;
 
@@ -193,17 +188,13 @@ impl Project {
             size: (u32, u32),
             fg: Fill,
             bg: Rgb<u8>) {
-        // for (id, obj) in self.objects.iter_mut() {
         for obj in self.objects.values_mut() {
-            // let (path, exists) = self.get_image_path(id);
             let (path, exists) = get_image_path(self.proj_dir.clone(), &obj.hash);
             if !exists {
                 let (width, height) = size;
                 let raw_data = stream_data(&obj.content);
                 let nframes = raw_data.len();
 
-                // let data = get_min_maxes(raw_data, nframes, width as usize);
-                // let (all_min, all_max, minmaxes) = data.clone();
                 let (all_min, all_max, minmaxes) = get_min_maxes(raw_data, nframes, width as usize);
                 let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
 
@@ -215,7 +206,6 @@ impl Project {
             match obj {
                 SoundObject { thumbnail: Some(pth), .. } => (),
                 o => {
-                    // obj = SoundObject { content: o.content, thumbnail: Some(path)};
                     o.thumbnail = Some(path)
                 }
             }

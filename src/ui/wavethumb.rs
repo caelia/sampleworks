@@ -40,10 +40,6 @@ impl WaveThumb {
     ) -> Self {
         WaveThumb { id, snd_file, img_file, playing: false }
     }
-
-    // pub fn filename(&self) -> Cow<str> {
-    //     self.snd_file.file_name().unwrap().to_string_lossy()
-    // }
 }
 
 impl<'a> From<WaveThumb> for Element<'a, Message>
@@ -51,7 +47,6 @@ where Message: Clone + 'a,
 {
     fn from(thumb: WaveThumb) -> Self {
         let ifile_name = thumb.img_file.to_string_lossy();
-        // let sfile_name = thumb.snd_file.clone().file_name().unwrap().to_string_lossy();
         let sfile_name = thumb.id.clone();
         column![
             mouse_area(

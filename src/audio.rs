@@ -1,9 +1,4 @@
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use rodio::{Decoder, decoder::DecoderError, Sink, OutputStream, OutputStreamBuilder, source::Source};
-// use sndfile::{OpenOptions, ReadOptions};
 use anyhow::Result;
 
 use std::fs::File;
@@ -31,7 +26,6 @@ pub enum AudioState {
     Running,
 }
 
-// pub type Queue = Vec<QItem>;
 pub struct Queue {
     items: Vec<PathBuf>,
     idx: usize,

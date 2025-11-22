@@ -47,9 +47,7 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
         SourceSpec::Dir(Box::new(src_path)),
         proj_path,
     );
-    // let proj_result = project.init(true);
-    // for fname in args.skip(1) {
-
+    
     let files = project.get_src_files();
 
     match files {
@@ -66,7 +64,6 @@ fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, 
     }
 }
 
-// fn main() -> anyhow::Result<()> {
 fn main() -> iced::Result {
     let cfg = match configura::load_config::<SWConfig>() {
         Ok(config) => config,
@@ -101,11 +98,6 @@ fn main() -> iced::Result {
         Rgb([221, 221, 221])
     );
 
-    /*
-    let browser = SampleBrowser::new(
-        &project, TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
-    );
-    */
     application("SampleWorks", SampleBrowser::update, SampleBrowser::view)
         .run_with(move || (
             SampleBrowser::new(
@@ -114,18 +106,3 @@ fn main() -> iced::Result {
             Task::none()
         ))
 }
-    /*
-    match create_thumbs(src_path.clone(), proj_path.clone()) {
-        Ok(file_map) => {
-            let browser = SampleBrowser::new(
-                &project,
-                file_map,
-                TxWrapper::new(req_tx),
-                RxWrapper::new(rsp_rx)
-            );
-            // let _ = browser.run(file_map);
-            Ok(())
-        },
-        Err(e) => Err(anyhow!(e))
-    }
-    */
