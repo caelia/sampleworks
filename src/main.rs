@@ -106,7 +106,7 @@ fn main() -> iced::Result {
         &project, TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
     );
     */
-    application("SampleWorks Prototype", SampleBrowser::update, SampleBrowser::view)
+    application("SampleWorks", SampleBrowser::update, SampleBrowser::view)
         .run_with(move || (
             SampleBrowser::new(
                 Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)

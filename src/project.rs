@@ -193,19 +193,18 @@ impl Project {
             size: (u32, u32),
             fg: Fill,
             bg: Rgb<u8>) {
-        // for id in self.objects.keys() {
-        // let objects = self.objects;
-        for (id, obj) in self.objects.iter_mut() {
+        // for (id, obj) in self.objects.iter_mut() {
+        for obj in self.objects.values_mut() {
             // let (path, exists) = self.get_image_path(id);
-            let (path, exists) = get_image_path(self.proj_dir.clone(), id);
+            let (path, exists) = get_image_path(self.proj_dir.clone(), &obj.hash);
             if !exists {
                 let (width, height) = size;
                 let raw_data = stream_data(&obj.content);
                 let nframes = raw_data.len();
 
-                let data = get_min_maxes(raw_data, nframes, width as usize);
+                // let data = get_min_maxes(raw_data, nframes, width as usize);
                 // let (all_min, all_max, minmaxes) = data.clone();
-                let (all_min, all_max, minmaxes) = data;
+                let (all_min, all_max, minmaxes) = get_min_maxes(raw_data, nframes, width as usize);
                 let vscale = (height as f32 / 2.0) / f32::max(f32::abs(all_min), f32::abs(all_max));
 
                 // UH-UH! Need to get rid of fg.clone()
