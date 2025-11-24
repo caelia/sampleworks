@@ -1,0 +1,48 @@
+# SampleWorks
+
+SampleWorks is a sound sample manager inspired by the concept of a light table.
+The main objective of the project is to facilitate a very efficient workflow
+when organizing and processing collections of samples.
+
+*IMPORTANT: the current version is just a demo!*
+
+![Image of SampleWorks GUI](swgui.png)
+
+## Features planned for v1.0
+
+* Quick A/B comparisons
+
+* An organizer window for sorting and grouping related samples
+
+* Comprehensive metadata management. Metadata will be used for filtering and
+sorting, and can be set through:
+  - extracting embedded metadata from files
+  - automated analysis of audio content
+  - tagging of individual files or groups of files by the user
+
+* Automated export of sample packs, ensuring consistency and conformance
+to the requirements of the target system or device (e.g. maximum length
+or file size, file format, stereo or mono, etc.)
+
+* The ability to extract and process regions of a source file. So, for
+example, if you have a recording that includes multiple drum hits, you
+will be able to select a region of the source file with your mouse, apply
+changes to just that region, and eventually export it as a new sample.
+
+## Open questions
+
+* Should SampleWorks have its own sound editing/filtering capabilities? I do
+not want to reinvent the wheel, so it would be nice to leverage an existing
+sound editor such as Audacity, but I'm not sure this can be done in a way that
+supports the efficient workflow that I'm aiming for.
+
+* What, if anything, should be the relationship between SampleWorks and other
+audio production software such as DAWs? Does it make sense to have a plugin
+version of SW?
+
+* Given that the objects to be displayed will include both sound files on disk,
+and derived objects, consisting of files or regions of files with modifications
+applied, what is the best way to assign IDs?
+
+* Is it feasible to generate waveform images that use color to distinguish
+different pitches? Or should we maybe use spectrograms?
