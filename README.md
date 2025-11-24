@@ -80,3 +80,6 @@ is saved on disk, and (2) to preserve content in case of a crash.
 and derived objects, consisting of files or regions of files with modifications
 applied, what is the best way to assign object IDs?
 
+## Last but not least ...
+
+Thanks for your interest! If you have any feedback, please use the Discussions and Issues sections of this repository.
