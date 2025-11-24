@@ -8,6 +8,21 @@ when organizing and processing collections of samples.
 
 ![Image of SampleWorks GUI](swgui.png)
 
+## Running the demo
+
+1. Clone the repo and `cargo run`. If that's not enough info for you, please
+be patient - we're just getting started here!
+
+2. In addition to compiling a bunch of code, SampleWorks needs to generate
+waveform images for 59 audio samples. It's pretty slow in debug mode.
+
+3. Once the GUI comes up, you can: (1) click on a waveform image to play the
+corresponding sound; (2) stop playback by clicking again; or (3) click on a
+different image to play a different sound.
+
+*Please note that this program has only been tested on my own Manjaro Linux
+system. Let me know if it doesn't work for you!*
+
 ## Features planned for v1.0
 
 * Quick A/B comparisons
@@ -46,3 +61,8 @@ applied, what is the best way to assign IDs?
 
 * Is it feasible to generate waveform images that use color to distinguish
 different pitches? Or should we maybe use spectrograms?
+
+* How much work should we put into analysis tools? For example, it would be
+possible and maybe desirable to do a visual comparison between the waveforms
+or spectrograms of two similar samples. Is that worth the extra effort, or
+should we just focus on listening?

@@ -41,8 +41,8 @@ fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
 |    A collection of sound samples is being installed in             |
 |    {:?}.   |
 |                                                                    |
-|    You may also place your own samples in this directory, and they |
-|    will be detected and displayed by SampleWorks.                  |
+|    You may also place your own samples in this directory, and      |
+|    they will be detected and displayed by SampleWorks.             |
 |                                                                    |
 |    Thumbnail images will be generated in                           |
 |    {:?}.   |
