@@ -44,6 +44,8 @@ example, if you have a recording that includes multiple drum hits, you
 will be able to select a region of the source file with your mouse, apply
 changes to just that region, and eventually export it as a new sample.
 
+* Some form of editing/filtering capability (but see Open Questions).
+
 ## Open questions
 
 * Should SampleWorks have its own sound editing/filtering capabilities? I do
@@ -55,10 +57,6 @@ supports the efficient workflow that I'm aiming for.
 audio production software such as DAWs? Does it make sense to have a plugin
 version of SW?
 
-* Given that the objects to be displayed will include both sound files on disk,
-and derived objects, consisting of files or regions of files with modifications
-applied, what is the best way to assign IDs?
-
 * Is it feasible to generate waveform images that use color to distinguish
 different pitches? Or should we maybe use spectrograms?
 
@@ -66,3 +64,19 @@ different pitches? Or should we maybe use spectrograms?
 possible and maybe desirable to do a visual comparison between the waveforms
 or spectrograms of two similar samples. Is that worth the extra effort, or
 should we just focus on listening?
+
+* What's the best way to manage in-process sound objects? E.g. if the user
+extracts a region from a source file, it becomes its own object in the GUI.
+If that object is cloned (in order, for example, to compare how two different
+FX plugins affect the sound), then another object is created. So a medium-sized
+project can potentially have hundreds of sound objects, some of which may be
+duplicates. From the POV of storage and memory efficiency, it would be best
+to represent each object as a reference to an audio source + changes, but at
+some point a new audio file should be saved to disk, for two reasons: (1) to
+prevent discrepancies between the audio referenced in a project and that which
+is saved on disk, and (2) to preserve content in case of a crash.
+
+* Given that the objects to be displayed will include both sound files on disk,
+and derived objects, consisting of files or regions of files with modifications
+applied, what is the best way to assign object IDs?
+
