@@ -4,7 +4,7 @@ SampleWorks is a sound sample manager inspired by the concept of a light table.
 The main objective of the project is to facilitate a very efficient workflow
 when organizing and processing collections of samples.
 
-*IMPORTANT: the current version is just a demo!*
+**IMPORTANT: the current version is just a demo!**
 
 ![Image of SampleWorks GUI](swgui.png)
 
