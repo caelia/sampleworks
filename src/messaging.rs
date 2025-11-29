@@ -10,6 +10,8 @@ use std::time::Duration;
 use std::cell::RefCell;
 use std::thread::sleep;
 
+use crate::sound_object::AudioContent;
+
 /*
 pub enum Message {
     FatalError(anyhow::Error),
@@ -34,9 +36,9 @@ pub enum Position {
 
 #[derive(Debug, Clone)]
 pub enum ACReq {
-    Audition(PathBuf),
-    QueueAdd(PathBuf),
-    QueueInsert(PathBuf,usize),
+    Audition(AudioContent),
+    QueueAdd(AudioContent),
+    QueueInsert(AudioContent, usize),
     QueueRemove(usize),
     PlayQueue,
     Pause,

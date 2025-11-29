@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-#![allow(dead_code)]
+// #![allow(dead_code)]
 
 use anyhow::{Result, Error, anyhow};
 use image::Rgb;
@@ -13,7 +13,7 @@ use std::cmp::Ordering;
 
 use crate::img::*;
 use crate::audio::*;
-use crate::sound_object::SoundObject;
+use crate::sound_object::{SoundObject, FileObject, AudioContent};
 
 
 #[derive(Debug, Clone)]
@@ -42,15 +42,15 @@ pub fn get_image_path(proj_dir: PathBuf, hash_str: &String) -> (PathBuf, bool) {
     (path, exists)
 }
 
-#[derive(Debug, Clone)]
-pub struct Project<O: SoundObject> {
+#[derive(Debug)]
+pub struct Project {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
     pub export_dirs: HashMap<String, PathBuf>,
-    pub objects: BTreeMap<String, O>,
+    pub objects: BTreeMap<String, Box<dyn SoundObject>>,
 }
 
-impl<O: SoundObject> Project<O> {
+impl Project {
     pub fn new(source: SourceSpec, proj_dir: PathBuf) -> Self {
         source.validate_source();
         let export_dirs = HashMap::new();
@@ -74,15 +74,6 @@ impl<O: SoundObject> Project<O> {
         create_dir_all(&self.proj_dir)?;
         create_dir(self.proj_dir.join("images"))?;
         Ok(())
-    }
-
-    fn old_get_image_path(&self, sndfile_path: &PathBuf) -> PathBuf {
-        let image_dir = self.proj_dir.join("images");
-        let image_name_stem = sndfile_path
-            .display()
-            .to_string()
-            .replace(std::path::MAIN_SEPARATOR_STR, "-");
-        image_dir.join(PathBuf::from(image_name_stem).with_extension("png"))
     }
 
     pub fn get_image_path(&self, hash_str: &String) -> (PathBuf, bool) {
@@ -179,10 +170,10 @@ impl<O: SoundObject> Project<O> {
             if f.extension().unwrap() == "txt" {
                 continue;
             }
-            match SoundObject::new(f.clone()) {
+            match FileObject::new(f.clone()) {
                 Ok(obj) => {
                     let id = f.file_name().unwrap().to_string_lossy().into_owned();
-                    self.objects.insert(id.clone(), obj);
+                    self.objects.insert(id.clone(), Box::new(obj));
                 },
                 Err(e) => return Err(anyhow!(e)),
             }
@@ -196,10 +187,12 @@ impl<O: SoundObject> Project<O> {
             fg: Fill,
             bg: Rgb<u8>) {
         for obj in self.objects.values_mut() {
-            let (path, exists) = get_image_path(self.proj_dir.clone(), &obj.hash);
+            let (path, exists) = get_image_path(self.proj_dir.clone(), &obj.hash());
             if !exists {
                 let (width, height) = size;
-                let raw_data = stream_data(&obj.content);
+                let raw_data = match obj.content() {
+                    AudioContent::File(path) => stream_data(&path),
+                };
                 let nframes = raw_data.len();
 
                 let (all_min, all_max, minmaxes) = get_min_maxes(raw_data, nframes, width as usize);
@@ -210,16 +203,20 @@ impl<O: SoundObject> Project<O> {
                 wf_img.draw(minmaxes);
                 wf_img.save(&path);
             }
-            match obj {
-                SoundObject { thumbnail: Some(pth), .. } => (),
-                o => {
-                    o.thumbnail = Some(path)
-                }
-            }
+            obj.set_thumbnail(path);
         }
     }
 
-    pub fn get_object(&self, id: &String) -> Option<&SoundObject> {
-        self.objects.get(id)
+    /*
+    pub fn get_object(&self, id: &String) -> &Option<Box<dyn SoundObject>> {
+        &self.objects.get(id)
+    }
+    */
+
+    pub fn get_audio(&self, id: &String) -> Option<AudioContent> {
+        match self.objects.get(id) {
+            Some(obj) => Some(obj.content()),
+            None => None,
+        }
     }
 }

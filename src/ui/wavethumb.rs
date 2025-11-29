@@ -9,6 +9,7 @@ use iced::widget::{text, image, mouse_area, column, horizontal_rule};
 use std::path::PathBuf;
 
 use super::Message;
+use crate::sound_object::AudioContent;
 
 
 fn trim_text(txt: String, limit: usize) -> String {
@@ -23,7 +24,7 @@ fn trim_text(txt: String, limit: usize) -> String {
 #[derive(Debug, Clone)]
 pub struct WaveThumb {
     id: String,
-    snd_file: PathBuf,
+    audio: AudioContent,
     img_file: PathBuf,
     playing: bool,
 }
@@ -31,10 +32,10 @@ pub struct WaveThumb {
 impl WaveThumb {
     pub fn new(
         id: String,
-        snd_file: PathBuf,
+        audio: AudioContent,
         img_file: PathBuf,
     ) -> Self {
-        WaveThumb { id, snd_file, img_file, playing: false }
+        WaveThumb { id, audio, img_file, playing: false }
     }
 }
 

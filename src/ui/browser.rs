@@ -18,7 +18,7 @@ use std::thread::sleep;
 
 use super::wavethumb;
 use super::Message;
-use crate::common::SoundObject;
+use crate::sound_object::SoundObject;
 use crate::project::Project;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
@@ -45,9 +45,9 @@ impl SampleBrowser {
 
     pub fn view(&self) -> Element<Message> {
         let thumbs = self.project.objects.iter().map(|(id, obj)| {
-            let img_file = obj.thumbnail.clone().unwrap();
+            let img_file = obj.thumbnail().clone().unwrap();
             wavethumb::WaveThumb::new(
-                id.clone(), obj.content.clone(), img_file
+                id.clone(), obj.content().clone(), img_file
             ).into()
         }).collect::<Vec<_>>();
 
@@ -78,9 +78,9 @@ impl SampleBrowser {
                     self.playing = None;
                 }
                 if start {
-                    if let Some(obj) = self.project.get_object(&id) {
-                        let snd_file = obj.content.clone();
-                        self.req_tx.send(ACReq::Audition(snd_file));
+                    if let Some(audio) = self.project.get_audio(&id) {
+                        // let snd_file = obj.content.clone();
+                        self.req_tx.send(ACReq::Audition(audio));
                         self.playing = Some(id);
                     }
                 }

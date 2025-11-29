@@ -65,30 +65,6 @@ fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
 
 ///////////////////////////////////////////////////////////////////////
 
-/*
-fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
-    let project = Project::new(
-        SourceSpec::Dir(Box::new(src_path)),
-        proj_path,
-    );
-    
-    let files = project.get_src_files();
-
-    match files {
-        Ok(fls) => {
-            let file_map = project.get_thumbs(
-                fls,
-                (800, 320),
-                Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
-                Rgb([221, 221, 221])
-            ).unwrap();
-            Ok(file_map)
-        },
-        Err(e) => Err(e.into()),
-    }
-}
-*/
-
 fn main() -> iced::Result {
     let cfg = match configura::load_config::<SWConfig>() {
         Ok(config) => config,
