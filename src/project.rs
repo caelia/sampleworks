@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use anyhow::{Result, Error, anyhow};
 use image::Rgb;
 use blake3::hash as b3hash;

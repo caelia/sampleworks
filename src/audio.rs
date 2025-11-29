@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use rodio::{Decoder, decoder::DecoderError, Sink, OutputStream, OutputStreamBuilder, source::Source};
 use anyhow::Result;
 

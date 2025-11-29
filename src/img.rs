@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use std::path::PathBuf;
 use image::{ImageBuffer, Rgb, RgbImage, Pixel};
 

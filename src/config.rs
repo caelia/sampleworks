@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use configura::{Config, formats::JsonFormat};
 use directories::{UserDirs, ProjectDirs};
 use serde::{Deserialize, Serialize};
