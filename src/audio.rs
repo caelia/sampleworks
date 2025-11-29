@@ -14,6 +14,7 @@ use std::time::Duration;
 use std::iter::Iterator;
 
 use crate::messaging::{ACReq, ACRsp};
+use crate::sound_object::AudioContent;
 
 /*
 pub enum QItem {
@@ -90,7 +91,7 @@ impl Controller {
         let sink = Sink::connect_new(&output.mixer());
         loop {
             match self.req_rx.try_recv() {
-                Ok(ACReq::Audition(path)) => {
+                Ok(ACReq::Audition(AudioContent::File(path))) => {
                     let file = File::open(path)?;
                     let src = Decoder::try_from(file)?;
                     sink.append(src)

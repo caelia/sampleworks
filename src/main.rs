@@ -120,7 +120,7 @@ fn main() -> iced::Result {
     application("SampleWorks", SampleBrowser::update, SampleBrowser::view)
         .run_with(move || (
             SampleBrowser::new(
-                Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
+                Rc::new(project), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
             ),
             Task::none()
         ))

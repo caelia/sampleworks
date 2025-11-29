@@ -42,7 +42,7 @@ pub fn get_image_path(proj_dir: PathBuf, hash_str: &String) -> (PathBuf, bool) {
     (path, exists)
 }
 
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct Project {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
