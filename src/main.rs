@@ -2,6 +2,7 @@ mod common;
 mod config;
 mod audio;
 mod img;
+mod sound_object;
 mod project;
 mod ui;
 mod util;

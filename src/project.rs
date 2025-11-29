@@ -9,7 +9,7 @@ use std::cmp::Ordering;
 
 use crate::img::*;
 use crate::audio::*;
-use crate::common::SoundObject;
+use crate::sound_object::SoundObject;
 
 
 #[derive(Debug, Clone)]
@@ -39,14 +39,14 @@ pub fn get_image_path(proj_dir: PathBuf, hash_str: &String) -> (PathBuf, bool) {
 }
 
 #[derive(Debug, Clone)]
-pub struct Project {
+pub struct Project<O: SoundObject> {
     pub source: SourceSpec,
     pub proj_dir: PathBuf,
     pub export_dirs: HashMap<String, PathBuf>,
-    pub objects: BTreeMap<String, SoundObject>,
+    pub objects: BTreeMap<String, O>,
 }
 
-impl Project {
+impl<O: SoundObject> Project<O> {
     pub fn new(source: SourceSpec, proj_dir: PathBuf) -> Self {
         source.validate_source();
         let export_dirs = HashMap::new();
