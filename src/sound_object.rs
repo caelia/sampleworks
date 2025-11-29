@@ -5,6 +5,7 @@ use rodio::{Decoder, source::Source};
 use std::path::PathBuf;
 use std::time::Duration;
 use std::fs::File;
+use std::sync::LazyLock;
 
 use crate::common::Channels;
 
@@ -22,10 +23,8 @@ pub struct FileObject {
     pub hash: String,
     pub content: PathBuf,    // audio file
     pub thumbnail: Option<PathBuf>,  // image file
-    length: Option<Duration>,
-    sample_rate: Option<u32>,
-    channels: Option<Channels>,
-}
+    audio_data: LazyLock<(Duration, u32, u16)>;
+} 
 
 impl FileObject {
     pub fn new(content: PathBuf) -> Result<Self> {
@@ -37,9 +36,8 @@ impl FileObject {
             hash,
             content,
             thumbnail: None,
-            length: None,
-            sample_rate: None,
-            channels: None,
+            audio_data: LazyLock::new(|| {
+            })
         })
     }
 
