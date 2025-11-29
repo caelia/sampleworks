@@ -23,7 +23,7 @@ pub struct FileObject {
     pub hash: String,
     pub content: PathBuf,    // audio file
     pub thumbnail: Option<PathBuf>,  // image file
-    audio_data: LazyLock<(Duration, u32, u16)>;
+    audio_data: LazyLock<(Option<Duration>, u32, Channels)>;
 } 
 
 impl FileObject {
@@ -32,12 +32,24 @@ impl FileObject {
             Ok(bytes) => b3hash(bytes.as_slice()).to_string(),
             Err(e) => return Err(anyhow!(e)),
         };
+        let audio_data = LazyLock::new(|| {
+            let f = File::open(&content).unwrap();
+            let src = Decoder::try_from(f).unwrap();
+            (
+                src.total_duration(),
+                src.sample_rate() as u32,
+                match src.channels() {
+                    1 => Channels::Mono,
+                    2 => Channels::Stereo,
+                    c => Channels::Other(c),
+                }
+            )
+        });
         Ok(Self {
             hash,
             content,
             thumbnail: None,
-            audio_data: LazyLock::new(|| {
-            })
+            audio_data,
         })
     }
 
