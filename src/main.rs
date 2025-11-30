@@ -11,6 +11,7 @@ mod project;
 mod ui;
 mod util;
 mod messaging;
+mod metadata;
 
 // use sndfile::{OpenOptions, ReadOptions};
 use image::Rgb;
