@@ -2,7 +2,7 @@
 
 // use iced::advanced::{image::Image};
 use iced::{Element, Length, Alignment};
-use iced::widget::{text, image, mouse_area, column, horizontal_rule};
+use iced::widget::{text, image, mouse_area, column, rule};
 
 use std::path::PathBuf;
 
@@ -50,7 +50,7 @@ where Message: Clone + 'a,
             text(trim_text(sfile_name, 38))
                 .width(Length::Fill)
                 .align_x(Alignment::Center),
-            horizontal_rule(1)
+            rule::horizontal(1)
         ]
         .width(Length::Shrink)
         .spacing(4)

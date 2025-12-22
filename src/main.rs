@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 mod common;
 mod config;
 mod audio;
@@ -22,7 +26,7 @@ use std::thread;
 use crate::audio::*;
 use crate::img::*;
 use crate::project::{Project, SourceSpec};
-use crate::ui::browser::SampleBrowser;
+use crate::ui::window::MainWindow;
 use crate::config::SWConfig;
 use crate::messaging::{TxWrapper, RxWrapper};
 
@@ -136,11 +140,20 @@ fn main() -> iced::Result {
         Rgb([221, 221, 221])
     );
 
-    application("SampleWorks", SampleBrowser::update, SampleBrowser::view)
+    /*
+    application("SampleWorks", MainWindow::update, MainWindow::view)
         .run_with(move || (
-            SampleBrowser::new(
+            MainWindow::new(
                 Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
             ),
             Task::none()
         ))
+        */
+    application(
+        MainWindow::new(
+            Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
+        ),
+        MainWindow::update,
+        MainWindow::view
+    ).run()
 }

@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 // use anyhow::{Result, Error, anyhow};
 
 use iced::widget::{Row, row, scrollable, center, container};
@@ -19,14 +23,14 @@ use crate::project::Project;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
 
-pub struct SampleBrowser {
+pub struct SourceBrowser {
     project: Rc<Project>,
     req_tx: Rc<TxWrapper<ACReq>>,
     rsp_rx: Rc<RxWrapper<ACRsp>>,
     playing: Option<String>,
 }
 
-impl SampleBrowser {
+impl SourceBrowser {
     pub fn new(project: Rc<Project>,
             tx: TxWrapper<ACReq>,
             rx: RxWrapper<ACRsp>)
