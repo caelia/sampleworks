@@ -52,12 +52,12 @@ pub enum ACRsp {
 const MAX_RETRIES: usize = 5;
 const RETRY_INTERVAL: Duration = Duration::from_millis(1);
 
-pub struct RxWrapper<Msg> {
-    rx: RefCell<Receiver<Msg>>,
+pub struct RxWrapper<'a, Msg> {
+    rx: RefCell<&'a Receiver<Msg>>,
 }
 
-impl<Msg> RxWrapper<Msg> {
-    pub fn new(rx: Receiver<Msg>) -> Self {
+impl<'a, Msg> RxWrapper<'a, Msg> {
+    pub fn new(rx: &'a Receiver<Msg>) -> Self {
         RxWrapper { rx: RefCell::new(rx) }
     }
 
@@ -82,12 +82,12 @@ impl<Msg> RxWrapper<Msg> {
     }
 }
 
-pub struct TxWrapper<Msg> {
-    tx: RefCell<Sender<Msg>>,
+pub struct TxWrapper<'a, Msg> {
+    tx: RefCell<&'a Sender<Msg>>,
 }
 
-impl<Msg: Clone> TxWrapper<Msg> {
-    pub fn new(tx: Sender<Msg>) -> Self {
+impl<'a, Msg: Clone> TxWrapper<'a, Msg> {
+    pub fn new(tx: &'a Sender<Msg>) -> Self {
         TxWrapper { tx: RefCell::new(tx) }
     }
 

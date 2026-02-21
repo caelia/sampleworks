@@ -22,23 +22,25 @@ use crate::common::SoundObject;
 use crate::project::Project;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
 
-
+/*
 pub struct SourceBrowser {
     project: Rc<Project>,
     req_tx: Rc<TxWrapper<ACReq>>,
     rsp_rx: Rc<RxWrapper<ACRsp>>,
     playing: Option<String>,
 }
+*/
 
+/*
 impl SourceBrowser {
     pub fn new(project: Rc<Project>,
-            tx: TxWrapper<ACReq>,
-            rx: RxWrapper<ACRsp>)
+            req_tx: Rc<TxWrapper<ACReq>>,
+            rsp_rx: Rc<RxWrapper<ACRsp>>)
             -> Self {
         Self {
             project,
-            req_tx: Rc::new(tx),
-            rsp_rx: Rc::new(rx),
+            req_tx,
+            rsp_rx,
             playing: None,
         }
     }
@@ -66,6 +68,7 @@ impl SourceBrowser {
     }
 
     pub fn update(&mut self, msg: Message) -> Task<Message> {
+        /*
         match msg {
             Message::Toggle(id) => {
                 let (stop, start) = match &self.playing {
@@ -87,6 +90,41 @@ impl SourceBrowser {
             },
             _ => (),
         }
+        */
         Task::none()
     }
 }
+*/
+
+pub struct SourceBrowser {
+    project: Rc<Project>,
+}
+
+impl SourceBrowser {
+    pub fn new(project: Rc<Project>) -> Self {
+        Self { project }
+    }
+
+    pub fn view(&self) -> Element<Message> {
+        let thumbs = self.project.objects.iter().map(|(id, obj)| {
+            let img_file = obj.thumbnail.clone().unwrap();
+            wavethumb::WaveThumb::new(
+                id.clone(), obj.content.clone(), img_file
+            ).into()
+        }).collect::<Vec<_>>();
+
+        scrollable(
+            container(
+                Row::from_vec(thumbs)
+                    .spacing(17)
+                    .padding(10)
+                    // .width(Length::Fill)
+                    .wrap()
+            )
+            .center_x(Length::Fill)
+        )
+        .width(Length::Fill)
+        .into()
+    }
+}
+

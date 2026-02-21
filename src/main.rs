@@ -150,9 +150,13 @@ fn main() -> iced::Result {
         ))
         */
     application(
-        MainWindow::new(
-            Rc::new(project.clone()), TxWrapper::new(req_tx), RxWrapper::new(rsp_rx)
-        ),
+        move || {
+            MainWindow::new(
+                Rc::new(project.clone()),
+                TxWrapper::new(&req_tx),
+                RxWrapper::new(&rsp_rx)
+            )
+        },
         MainWindow::update,
         MainWindow::view
     ).run()
