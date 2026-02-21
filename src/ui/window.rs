@@ -10,6 +10,7 @@ use super::organizer::Organizer;
 use super::Message;
 use crate::project::Project;
 use crate::messaging::{ACReq, ACRsp, TxWrapper, RxWrapper};
+use crate::audio::Controller;
 
 use std::rc::Rc;
 
@@ -19,31 +20,28 @@ enum Message {
 }
 */
 
-pub struct MainWindow<'a> {
+pub struct MainWindow {
     split_at: f32,
     browser: SourceBrowser,
     organizer: Organizer,
     project: Rc<Project>,
-    req_tx: TxWrapper<'a, ACReq>,
-    rsp_rx: RxWrapper<'a, ACRsp>,
     playing: Option<String>,
+    controller: Controller,
 }
 
-impl<'a> MainWindow<'a> {
+impl MainWindow {
     pub fn new(
         project: Rc<Project>,
-        req_tx: TxWrapper<'a, ACReq>,
-        rsp_rx: RxWrapper<'a, ACRsp>,
+        controller: Controller,
     ) -> Self {
     let browser = SourceBrowser::new(project.clone());
         let organizer = Organizer::new();
         Self {
-            split_at: 0.0,
+            split_at: 0.5,
             browser,
             organizer,
             project,
-            req_tx,
-            rsp_rx,
+            controller,
             playing: None,
         }
     }
@@ -67,13 +65,13 @@ impl<'a> MainWindow<'a> {
                     None => (false, true),
                 };
                 if stop {
-                    self.req_tx.send(ACReq::Stop);
+                    let _ = self.controller.stop();
                     self.playing = None;
                 }
                 if start {
                     if let Some(obj) = self.project.get_object(&id) {
                         let snd_file = obj.content.clone();
-                        self.req_tx.send(ACReq::Audition(snd_file));
+                        let _ = self.controller.play(&snd_file);
                         self.playing = Some(id);
                     }
                 }

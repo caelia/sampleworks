@@ -20,7 +20,6 @@ use iced::{Task, application};
 
 use std::rc::Rc;
 use std::path::PathBuf;
-use std::sync::mpsc::channel;
 use std::thread;
 
 use crate::audio::*;
@@ -28,7 +27,6 @@ use crate::img::*;
 use crate::project::{Project, SourceSpec};
 use crate::ui::window::MainWindow;
 use crate::config::SWConfig;
-use crate::messaging::{TxWrapper, RxWrapper};
 
 ///////////////////////////////////////////////////////////////////////
 /// TEMPORARY STUFF ///////////////////////////////////////////////////
@@ -64,29 +62,6 @@ fn demo_msg(src_path: &PathBuf, proj_path: &PathBuf) {
 
 ///////////////////////////////////////////////////////////////////////
 
-/*
-fn create_thumbs(src_path: PathBuf, proj_path: PathBuf) -> Result<Vec<(PathBuf, PathBuf)>> {
-    let project = Project::new(
-        SourceSpec::Dir(Box::new(src_path)),
-        proj_path,
-    );
-    
-    let files = project.get_src_files();
-
-    match files {
-        Ok(fls) => {
-            let file_map = project.get_thumbs(
-                fls,
-                (800, 320),
-                Fill::Gradient(Rgb([0, 203, 0]), Rgb([18, 0, 170]), 64, 240),
-                Rgb([221, 221, 221])
-            ).unwrap();
-            Ok(file_map)
-        },
-        Err(e) => Err(e.into()),
-    }
-}
-*/
 
 fn main() -> iced::Result {
     let cfg = match configura::load_config::<SWConfig>() {
@@ -125,14 +100,6 @@ fn main() -> iced::Result {
         proj_path.clone(),
     );
 
-    let (req_tx, req_rx) = channel();
-    let (rsp_tx, rsp_rx) = channel();
-
-    let mut audio_controller = Controller::new(rsp_tx, req_rx);
-    thread::spawn(move || {
-        let _ = audio_controller.run(true);
-    });
-        
     let _ = project.load_objects();
     project.load_thumbs(
         (800, 320),
@@ -153,8 +120,7 @@ fn main() -> iced::Result {
         move || {
             MainWindow::new(
                 Rc::new(project.clone()),
-                TxWrapper::new(&req_tx),
-                RxWrapper::new(&rsp_rx)
+                Controller::new(),
             )
         },
         MainWindow::update,

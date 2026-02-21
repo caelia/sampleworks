@@ -62,40 +62,42 @@ impl Iterator for Queue {
 }
 
 pub struct Controller {
-    rsp_tx: Sender<ACRsp>,
-    req_rx: Receiver<ACReq>,
     state: AudioState,
     queue: Option<Queue>,
+    sink: Option<Sink>,
 }
 
 impl Controller {
-    pub fn new(rsp_tx: Sender<ACRsp>, req_rx: Receiver<ACReq>) -> Self {
+    pub fn new() -> Self {
         Controller {
-            rsp_tx,
-            req_rx,
             state: AudioState::Stopped,
             queue: None,
+            sink: None,
         }
     }
 
-    pub fn run(&mut self, looping: bool) -> Result<()> {
-        let poll_interval = Duration::from_millis(10);
-        // let mut queue = Queue::new(looping);
-        let output = OutputStreamBuilder::open_default_stream()
-            .expect("Failed to open default audio stream.");
-        let sink = Sink::connect_new(&output.mixer());
-        loop {
-            match self.req_rx.try_recv() {
-                Ok(ACReq::Audition(path)) => {
-                    let file = File::open(path)?;
-                    let src = Decoder::try_from(file)?;
-                    sink.append(src)
-                },
-                Ok(ACReq::Stop) => sink.stop(),
-                _ => (),
+    pub fn play(&mut self, path: &PathBuf) -> Result<()> {
+        let file = File::open(path)?;
+        let src = Decoder::try_from(file)?;
+        match &self.sink {
+            Some(snk) => snk.append(src),
+            None => {
+                let output = OutputStreamBuilder::open_default_stream()
+                    .expect("Failed to open default audio stream.");
+                let snk = Sink::connect_new(&output.mixer());
+                snk.append(src);
+                self.sink = Some(snk);
             }
-            sleep(poll_interval);
         }
+        Ok(())
+    }
+
+    pub fn stop(&self) -> Result<()> {
+        match self.sink {
+            Some(ref snk) => snk.stop(),
+            None => (),
+        }
+        Ok(())
     }
 
     pub fn audition(&self) -> Result<()> {
